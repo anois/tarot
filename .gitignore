@@ -1,0 +1,28 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# build
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+
+# env / secrets — NEVER commit. The user's BYOK key lives here for local dev only.
+.env
+.env.*
+!.env.example
+
+# editor / os
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# test / coverage
+coverage
+playwright-report
+test-results

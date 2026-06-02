@@ -1,0 +1,21 @@
+Tarot card face images — Rider-Waite-Smith deck
+=================================================
+
+These 78 card images depict the Rider-Waite-Smith tarot deck, originally
+published 1909/1910 (artwork by Pamela Colman Smith), which is in the PUBLIC
+DOMAIN in the United States.
+
+Source of this particular image set: metabismuth/tarot-json
+  https://github.com/metabismuth/tarot-json  (code MIT; images noted PD in US)
+Files were renamed to this app's stable imageKey scheme:
+  major_00.jpg .. major_21.jpg
+  <suit>_<rank>.jpg  with suit ∈ {wands,cups,swords,pentacles},
+                          rank ∈ {01..10, page, knight, queen, king}
+
+Provenance caveat / TODO before public production deployment:
+  Verify these scans are the original 1909 edition (NOT the still-copyrighted
+  1971 U.S. Games recoloring), or replace with a confirmed-1909 set (Wikimedia
+  Commons "Rider-Waite tarot deck (Roses & Lilies)") or the explicitly-CC0
+  luciellaes itch.io pack. The imageKey↔filename mapping is stable, so this is a
+  drop-in replacement. Also note "Rider-Waite" is a U.S. Games trademark — do not
+  brand the app as that mark.

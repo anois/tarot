@@ -1,0 +1,9 @@
+# Production security headers (Netlify / Cloudflare Pages format).
+# connect-src deliberately limits where the user's BYOK key can be sent.
+# Anthropic-native users must add https://api.anthropic.com; custom-provider
+# users must self-host and relax connect-src. Do NOT make connect-src a wildcard.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://api.deepseek.com https://openrouter.ai; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: geolocation=(), microphone=(), camera=()

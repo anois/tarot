@@ -1,0 +1,129 @@
+@import 'tailwindcss';
+
+/* ── Mystical cosmic theme tokens (Tailwind v4 @theme) ────────────────── */
+@theme {
+  --color-night-950: #07061a;
+  --color-night-900: #0b0a1a;
+  --color-night-800: #131129;
+  --color-night-700: #1d1a3a;
+  --color-night-600: #2a2552;
+  --color-mystic-400: #7c6cff;
+  --color-mystic-300: #9d8cff;
+  --color-mystic-200: #c3b8ff;
+  --color-gold-500: #d9a441;
+  --color-gold-400: #e8c468;
+  --color-gold-300: #f3dca0;
+  --color-ink-100: #e9e6ff;
+  --color-ink-300: #b8b2da;
+  --color-ink-500: #837ca6;
+
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 800px at 50% -10%, var(--color-night-700), transparent 60%),
+    radial-gradient(900px 600px at 90% 110%, var(--color-night-600), transparent 55%),
+    var(--color-night-950);
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* subtle starfield using layered radial dots */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 40% 80%, rgba(227, 196, 104, 0.4), transparent),
+    radial-gradient(1px 1px at 85% 15%, rgba(255, 255, 255, 0.4), transparent);
+  background-size:
+    400px 400px,
+    300px 300px,
+    500px 500px,
+    350px 350px;
+  opacity: 0.6;
+  z-index: 0;
+}
+
+/* LLM markdown output */
+.md {
+  line-height: 1.7;
+  color: var(--color-ink-100);
+}
+.md h1,
+.md h2,
+.md h3 {
+  font-family: var(--font-display);
+  color: var(--color-gold-300);
+  margin: 1.1em 0 0.5em;
+  line-height: 1.3;
+}
+.md h2 {
+  font-size: 1.15rem;
+}
+.md h3 {
+  font-size: 1.02rem;
+}
+.md p {
+  margin: 0.6em 0;
+}
+.md ul,
+.md ol {
+  margin: 0.5em 0;
+  padding-left: 1.3em;
+}
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md li {
+  margin: 0.25em 0;
+}
+.md strong {
+  color: var(--color-gold-300);
+  font-weight: 600;
+}
+.md em {
+  color: var(--color-mystic-200);
+}
+.md blockquote {
+  border-left: 3px solid var(--color-mystic-400);
+  padding-left: 0.9em;
+  color: var(--color-ink-300);
+  margin: 0.6em 0;
+}
+.md hr {
+  border: none;
+  border-top: 1px solid var(--color-night-600);
+  margin: 1em 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
