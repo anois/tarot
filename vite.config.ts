@@ -1,10 +1,31 @@
 import { defineConfig } from 'vitest/config'
+import type { PluginOption } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
+import { copyFileSync, existsSync } from 'node:fs'
+
+// GitHub Pages serves a project site under /<repo>/. CI sets BASE_PATH to
+// "/<repo>/"; local dev/build default to "/".
+const base = process.env.BASE_PATH || '/'
+
+/** Emit dist/404.html (a copy of index.html) so GitHub Pages serves the SPA for
+ *  deep links like /<repo>/settings (BrowserRouter then handles routing). */
+function spaFallback(): PluginOption {
+  return {
+    name: 'spa-404-fallback',
+    apply: 'build',
+    closeBundle() {
+      const dist = fileURLToPath(new URL('./dist', import.meta.url))
+      const index = `${dist}/index.html`
+      if (existsSync(index)) copyFileSync(index, `${dist}/404.html`)
+    },
+  }
+}
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  base,
+  plugins: [react(), tailwindcss(), spaFallback()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
