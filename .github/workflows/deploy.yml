@@ -1,4 +1,14 @@
-name: Deploy to GitHub Pages
+# Dual-target deploy for tarot.
+#
+# Trigger: push to `main`, or a manual run via the Actions tab.
+# Targets (independent jobs — a failure on one doesn't block the other):
+#   1. GitHub Pages → https://anois.github.io/tarot/   (worldwide entry; base=/tarot/)
+#   2. Aliyun OSS   → CN-domestic mirror, served at the bucket root (base=/)
+#
+# Because the two targets need DIFFERENT Vite base paths (Pages lives under
+# /<repo>/, OSS lives at the bucket root), each builds its own artifact.
+
+name: Deploy
 
 on:
   push:
@@ -10,13 +20,13 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment, cancelling in-progress runs.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
-  build:
+  # ── GitHub Pages (base = /<repo>/) ──────────────────────────────────────
+  build-pages:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,18 +38,17 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Build
+      - name: Build (base = /<repo>/)
         run: pnpm build
         env:
-          # Project sites are served under /<repo>/ — set Vite base accordingly.
           BASE_PATH: /${{ github.event.repository.name }}/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-  deploy:
-    needs: build
+  deploy-pages:
+    needs: build-pages
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -47,3 +56,42 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # ── Aliyun OSS, CN-domestic mirror (base = /, served at bucket root) ─────
+  # Enable by setting repo variable ENABLE_OSS_DEPLOY=true once the four
+  # ALIYUN_* secrets exist (see docs/deploy.md). Off by default / on forks.
+  deploy-oss:
+    runs-on: ubuntu-latest
+    if: ${{ vars.ENABLE_OSS_DEPLOY == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build (base = / for bucket root)
+        run: pnpm build
+        env:
+          BASE_PATH: /
+      - name: Sync to Aliyun OSS
+        uses: fangbinwei/aliyun-oss-website-action@v1
+        with:
+          accessKeyId: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+          accessKeySecret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+          bucket: ${{ secrets.ALIYUN_OSS_BUCKET }}
+          endpoint: ${{ secrets.ALIYUN_OSS_ENDPOINT }}
+          folder: ./dist
+          # Static-website docs: index.html as home, 404.html as the SPA
+          # fallback (Vite emits both — see vite.config.ts spaFallback).
+          indexPage: index.html
+          notFoundPage: 404.html
+          # Skip files whose ETag is unchanged; faster than a full re-upload.
+          incremental: true
+          # Vite asset filenames are content-hashed, so they're safe to cache;
+          # html is revalidated every visit so new hashes are picked up at once.
+          htmlCacheControl: 'no-cache'
+          otherCacheControl: 'public, max-age=86400'

@@ -35,7 +35,14 @@ pnpm preview    # 预览构建产物
 
 ## 部署
 
-`pnpm build` 产出纯静态 `dist/`，可部署到任意静态托管（Cloudflare Pages / Netlify / GitHub Pages 等）。`public/_headers` 提供了生产环境的 CSP 等安全响应头（Netlify / CF Pages 格式）：`connect-src` 已限制为所选大模型服务商，自定义服务商需相应放宽。
+`pnpm build` 产出纯静态 `dist/`，可部署到任意静态托管。本仓库通过 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) 双目标自动部署（推 `main` 即发布）：
+
+- **GitHub Pages**（全球入口，`base=/tarot/`）：<https://anois.github.io/tarot/>
+- **阿里云 OSS**（国内镜像，`base=/` 桶根）：可选，配置好 `ALIYUN_*` 密钥并设 `ENABLE_OSS_DEPLOY=true` 后启用。
+
+详细的国内 OSS 部署步骤（建桶、RAM 子用户、密钥、ICP/安全页注意事项）见 [docs/deploy.md](docs/deploy.md)。
+
+`public/_headers` 的 CSP 仅 Netlify / Cloudflare Pages 生效；GitHub Pages 与 OSS 不读取该文件，故其上 `connect-src` 不强制（BYOK 应用仅会调用用户自选的服务商，功能不受影响）。
 
 ## 技术栈
 
