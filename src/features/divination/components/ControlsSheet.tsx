@@ -13,12 +13,10 @@ const INITIAL_TEMPLATES: ReadingTemplate[] = ['structured', 'narrative', 'quick'
 export function ControlsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation()
   const phase = useDivination((s) => s.phase)
-  const question = useDivination((s) => s.question)
   const template = useDivination((s) => s.template)
   const reversedProbability = useDivination((s) => s.reversedProbability)
   const majorOnly = useDivination((s) => s.majorOnly)
   const spread = useDivination((s) => s.spread)
-  const setQuestion = useDivination((s) => s.setQuestion)
   const setTemplate = useDivination((s) => s.setTemplate)
   const setReversedProbability = useDivination((s) => s.setReversedProbability)
   const setMajorOnly = useDivination((s) => s.setMajorOnly)
@@ -36,17 +34,6 @@ export function ControlsSheet({ open, onClose }: { open: boolean; onClose: () =>
   return (
     <Sheet open={open} onClose={onClose} title={t('reading.controlsTitle')}>
       <div className="flex flex-col gap-5">
-        <div>
-          <label className="mb-1.5 block text-sm text-ink-300">{t('reading.questionLabel')}</label>
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder={t('reading.questionPlaceholder')}
-            rows={3}
-            className="w-full resize-none rounded-xl border border-night-600 bg-night-900/70 p-3 text-sm text-ink-100 outline-none focus:border-gold-400"
-          />
-        </div>
-
         <div>
           <label className="mb-1.5 block text-sm text-ink-300">{t('reading.pickTemplate')}</label>
           <div className="flex flex-wrap gap-2">

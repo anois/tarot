@@ -27,6 +27,7 @@ export default function ReadingRoute() {
   const drawn = useDivination((s) => s.drawn)
   const majorOnly = useDivination((s) => s.majorOnly)
   const setSpread = useDivination((s) => s.setSpread)
+  const setQuestion = useDivination((s) => s.setQuestion)
   const startShuffle = useDivination((s) => s.startShuffle)
   const undoLast = useDivination((s) => s.undoLast)
   const confirm = useDivination((s) => s.confirm)
@@ -52,8 +53,36 @@ export default function ReadingRoute() {
 
   return (
     <div className="flex flex-col">
-      {/* 3D canvas — the hero. Full-bleed on mobile. */}
-      <div className="relative -mx-4 h-[44svh] overflow-hidden border-y border-night-600/40 bg-night-900/40 md:mx-0 md:h-[52vh] md:rounded-2xl md:border">
+      {/* question — the starting point; edited inline, not buried in a sheet */}
+      {phase === 'idle' && (
+        <div className="mb-3 animate-rise">
+          <label
+            htmlFor="reading-question"
+            className="mb-1.5 flex items-center gap-1.5 text-sm text-ink-300"
+          >
+            <span className="text-gold-300">✦</span>
+            {t('reading.questionLabel')}
+          </label>
+          <textarea
+            id="reading-question"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder={t('reading.questionPlaceholder')}
+            rows={2}
+            className="w-full resize-none rounded-2xl border border-night-600/60 bg-night-900/60 p-3.5 text-base leading-relaxed text-ink-100 shadow-inner outline-none transition-colors placeholder:text-ink-500 focus:border-gold-400"
+          />
+          <p className="mt-1 px-1 text-xs text-ink-500">{t('reading.questionHint')}</p>
+        </div>
+      )}
+
+      {/* 3D canvas — the hero. Full-bleed on mobile. Shorter at idle so the
+          question + spread picker + shuffle CTA all fit above the fold. */}
+      <div
+        className={clsx(
+          'relative -mx-4 overflow-hidden border-y border-night-600/40 bg-night-900/40 md:mx-0 md:rounded-2xl md:border',
+          phase === 'idle' ? 'h-[27svh] md:h-[40vh]' : 'h-[44svh] md:h-[52vh]',
+        )}
+      >
         <ErrorBoundary
           fallback={() => (
             <div className="flex h-full items-center justify-center p-8 text-center text-sm text-ink-300">
@@ -66,14 +95,6 @@ export default function ReadingRoute() {
 
         {/* top status overlay */}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center gap-1.5 p-3">
-          {phase === 'idle' && (
-            <button
-              onClick={() => setControlsOpen(true)}
-              className="pointer-events-auto max-w-[92%] truncate rounded-full border border-night-600/60 bg-night-950/70 px-4 py-1.5 text-xs text-ink-200 backdrop-blur"
-            >
-              {question ? `「${question}」` : t('reading.questionTapHint')}
-            </button>
-          )}
           {phase === 'picking' && (
             <span className="rounded-full bg-night-950/70 px-3 py-1 text-xs text-ink-300">
               {t('reading.pickPrompt')}
