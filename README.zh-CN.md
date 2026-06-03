@@ -58,6 +58,12 @@
 
 <p align="center"><img src="docs/screenshots/03-mobile-card-detail.jpg" width="320" alt="卡牌详情面板，全中文" /></p>
 
+## 把占卜分享出去 —— 带二维码的图片
+
+占卜完成后，**分享图片** 会把牌阵（可选附带完整解读）合成为一张烛光风格的可分享图，并打上项目主张的徽标（**AI 解牌 · 数据不出本机 · 开源 · 隐私优先**）和指向项目的二维码。可直接下载，或交给系统分享面板。
+
+<p align="center"><img src="docs/screenshots/06-share.jpg" width="300" alt="分享面板：生成的占卜图片，含卖点徽标与二维码" /></p>
+
 ## 准备一把模型密钥（以 DeepSeek 为例）
 
 应用本身不含密钥，需要你自带。获取 DeepSeek 密钥：

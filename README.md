@@ -58,6 +58,12 @@ Tap any revealed card for a detail sheet: element, Golden-Dawn astrology, numero
 
 <p align="center"><img src="docs/screenshots/03-mobile-card-detail.jpg" width="320" alt="Card detail sheet, fully Chinese" /></p>
 
+## Share your reading — an image with a QR
+
+When a reading is done, **分享图片** composes a shareable PNG of the board (and, optionally, the full interpretation) in the candlelit style — stamped with what the project stands for (**AI reading · data never leaves your device · open-source & privacy-first**) and a QR back to the project. Save it, or hand it to the OS share sheet.
+
+<p align="center"><img src="docs/screenshots/06-share.jpg" width="300" alt="Share sheet: the generated reading image with value-prop badges and a QR" /></p>
+
 ## Getting a model key (DeepSeek)
 
 The app ships no key — you bring your own. To get a DeepSeek key:
