@@ -14,6 +14,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\""
   },
   "dependencies": {
+    "@fontsource/cinzel": "^5.2.8",
     "@react-spring/three": "^10.1.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",

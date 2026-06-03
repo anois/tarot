@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildReadingMessages, buildFollowupMessages, type ReadingContext } from './assemble'
 import { getBuiltinSpread } from '@/spreads/registry'
 import { getDeckCard } from '@/deck/deck'
+import { getMeaningZh } from '@/deck/meaningsZh'
 import type { DrawnCard } from '@/mechanics/types'
 
 const spread = getBuiltinSpread('three-card')!
@@ -44,10 +45,10 @@ describe('buildReadingMessages', () => {
   })
 
   it('uses reversed meanings for the reversed card, not upright', () => {
-    const death = getDeckCard('major_13')!
-    expect(user).toContain(death.meaning.reversed[0])
+    const death = getMeaningZh('major_13')!
+    expect(user).toContain(death.reversed[0])
     // an upright-only phrase should not appear if distinct
-    const uprightOnly = death.meaning.upright.find((u) => !death.meaning.reversed.includes(u))
+    const uprightOnly = death.upright.find((u) => !death.reversed.includes(u))
     if (uprightOnly) expect(user).not.toContain(uprightOnly)
   })
 

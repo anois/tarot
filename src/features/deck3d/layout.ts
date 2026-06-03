@@ -31,6 +31,21 @@ export function stackTransform(i: number): Transform {
   return { position: [0, 0.6, i * 0.006], rotation: [0, FACE_DOWN, 0], scale: 1 }
 }
 
+/**
+ * Idle "hero" pile: a prominent, neatly-stacked deck with visible thickness,
+ * centred and tilted slightly so it reads as a real deck of cards waiting to be
+ * shuffled (rather than a lone thumbnail). The whole pile breathes/floats and is
+ * tappable (see Deck) — the single focal object of the idle screen.
+ */
+export function idleStackTransform(i: number, n: number): Transform {
+  const t = n > 1 ? i / (n - 1) : 0 // 0 (bottom) .. 1 (top)
+  return {
+    position: [-0.06 + t * 0.13, 0.55 + t * 0.11, i * 0.012],
+    rotation: [0, FACE_DOWN, -0.05],
+    scale: 2.0,
+  }
+}
+
 /** Loose scattered ring used mid-shuffle. */
 export function scatterTransform(i: number, n: number): Transform {
   const a = (i / n) * Math.PI * 2
@@ -83,7 +98,8 @@ export function coverflowTransform(d: number): Transform {
   const x = sign * (1.25 + (c - 1) * 0.62)
   const y = RIBBON_Y - c * 0.04
   const z = 3.4 - c * 0.6
-  const tiltY = FACE_DOWN + sign * Math.min(ad, 5) * 0.46
+  // Gentle album-coverflow tilt (~30° max) — never past edge-on, so backs stay toward camera.
+  const tiltY = FACE_DOWN + sign * Math.min(ad, 4) * 0.14
   const scale = Math.max(0.58, 1.32 - c * 0.13)
   return { position: [x, y, z], rotation: [0, tiltY, sign * 0.05], scale }
 }
@@ -98,7 +114,11 @@ export function slotTransform(
 ): Transform {
   const x = (pos.x - 0.5) * plane.width
   const y = (0.5 - pos.y) * plane.height + BOARD_OFFSET_Y
-  const z = pos.z * 0.03
+  // Depth = paint-order layer (primary) + a per-card index tiebreaker, so cards
+  // that share the same `z` (e.g. a whole column) are never coplanar and stack
+  // stably instead of z-fighting/flickering. The tiebreaker exceeds a card's
+  // scaled thickness, so overlapping faces never intersect.
+  const z = pos.z * 0.05 + pos.index * 0.02
   const baseZ = -degToRad(pos.rotation)
   if (!opts.faceUp) {
     return { position: [x, y, z], rotation: [0, FACE_DOWN, baseZ], scale }

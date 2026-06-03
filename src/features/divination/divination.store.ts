@@ -25,6 +25,8 @@ interface DivinationState {
   picked: string[]
   drawn: DrawnCard[]
   hovered: number | null
+  /** Coverflow focus index (which deck position is centered/front while picking). */
+  centered: number
 
   // interpretation
   turns: ReadingTurn[]
@@ -46,6 +48,9 @@ interface DivinationState {
   startShuffle: () => void
   finishShuffle: () => void
   pick: (cardId: string) => void
+  setCentered: (i: number) => void
+  stepCentered: (delta: number) => void
+  pickCentered: () => void
   undoLast: () => void
   confirm: () => void
   finishReveal: () => void
@@ -69,6 +74,7 @@ export const useDivination = create<DivinationState>((set, get) => ({
   picked: [],
   drawn: [],
   hovered: null,
+  centered: 0,
   turns: [],
   streaming: null,
   interpreting: false,
@@ -105,12 +111,17 @@ export const useDivination = create<DivinationState>((set, get) => ({
     })
   },
   finishShuffle: () =>
-    set((s) => ({
-      phase: 'picking',
-      deckOrder: shuffle(activePool(s.majorOnly)),
-      picked: [],
-      hovered: null,
-    })),
+    set((s) => {
+      if (s.phase !== 'shuffling') return {} // ignore the late Deck timer after a tap-to-skip
+      const order = shuffle(activePool(s.majorOnly))
+      return {
+        phase: 'picking',
+        deckOrder: order,
+        picked: [],
+        hovered: null,
+        centered: Math.floor(order.length / 2),
+      }
+    }),
 
   pick: (cardId) => {
     const { phase, picked, spread } = get()
@@ -118,6 +129,15 @@ export const useDivination = create<DivinationState>((set, get) => ({
     if (picked.includes(cardId)) return
     if (picked.length >= spread.cardCount) return
     set({ picked: [...picked, cardId] })
+  },
+  setCentered: (i) =>
+    set((s) => ({ centered: Math.max(0, Math.min(s.deckOrder.length - 1, Math.round(i))) })),
+  stepCentered: (delta) =>
+    set((s) => ({ centered: Math.max(0, Math.min(s.deckOrder.length - 1, s.centered + delta)) })),
+  pickCentered: () => {
+    const { phase, deckOrder, centered } = get()
+    if (phase !== 'picking') return
+    get().pick(deckOrder[centered])
   },
   undoLast: () => {
     const { phase, picked } = get()

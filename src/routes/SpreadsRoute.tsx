@@ -8,6 +8,7 @@ import { SpreadPreview } from '@/spreads/SpreadPreview'
 import { BUILTIN_SPREADS } from '@/spreads/registry'
 import { downloadSpread, importSpreadFromFile } from '@/spreads/io'
 import { listStoredSpreads, saveSpread, deleteStoredSpread } from '@/spreads/repo'
+import { useDivination } from '@/features/divination/divination.store'
 import type { Spread } from '@/spreads/types'
 
 export default function SpreadsRoute() {
@@ -27,16 +28,25 @@ export default function SpreadsRoute() {
     await saveSpread(result.spread)
   }
 
+  // Selecting a spread here writes the store directly (the single seam) and
+  // jumps to the reading flow — no nav-state handoff needed.
+  function chooseSpread(spread: Spread) {
+    useDivination.getState().setSpread(spread)
+    navigate('/')
+  }
   function duplicateToEditor(spread: Spread, builtinId?: string) {
     navigate('/editor', { state: { spread, builtinId } })
   }
 
   return (
     <div>
-      <PageHeading title={t('nav.spreads')} />
+      <PageHeading title={t('nav.spreads')} subtitle={t('spreadsPage.subtitle')} />
 
-      <div className="mb-4 flex items-center gap-3">
-        <Button variant="secondary" onClick={() => fileRef.current?.click()}>
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <Button variant="primary" size="sm" onClick={() => navigate('/editor')}>
+          ＋ {t('editorPage.newSpread')}
+        </Button>
+        <Button variant="secondary" size="sm" onClick={() => fileRef.current?.click()}>
           {t('spreadsPage.importBtn')}
         </Button>
         <input
@@ -50,7 +60,7 @@ export default function SpreadsRoute() {
             e.target.value = ''
           }}
         />
-        {importError && <span className="text-sm text-red-400">{importError}</span>}
+        {importError && <span className="text-sm text-reversed">{importError}</span>}
       </div>
 
       <h2 className="mb-3 font-display text-xl text-gold-300">{t('spreadsPage.builtin')}</h2>
@@ -59,7 +69,7 @@ export default function SpreadsRoute() {
           <SpreadTile
             key={s.id}
             spread={s}
-            onUse={() => navigate('/', { state: { spreadId: s.id } })}
+            onUse={() => chooseSpread(s)}
             onDuplicate={() => duplicateToEditor(s, s.id)}
             onExport={() => downloadSpread(s)}
           />
@@ -73,7 +83,7 @@ export default function SpreadsRoute() {
             <SpreadTile
               key={ss.uuid}
               spread={ss.spread}
-              onUse={() => navigate('/', { state: { spreadUuid: ss.uuid } })}
+              onUse={() => chooseSpread(ss.spread)}
               onDuplicate={() => duplicateToEditor(ss.spread)}
               onExport={() => downloadSpread(ss.spread)}
               onDelete={() => void deleteStoredSpread(ss.uuid)}
@@ -102,7 +112,7 @@ function SpreadTile({
 }) {
   const { t } = useTranslation()
   return (
-    <div className="flex flex-col gap-2 rounded-2xl border border-night-600/50 bg-night-800/50 p-3">
+    <div className="flex flex-col gap-2.5 rounded-2xl border border-night-600/50 bg-night-800/50 p-3">
       <SpreadPreview spread={spread} />
       <div className="flex items-baseline justify-between gap-2">
         <span className="min-w-0 truncate font-medium text-ink-100" title={spread.name}>
@@ -112,22 +122,58 @@ function SpreadTile({
           {t('spreadsPage.cards', { n: spread.cardCount })}
         </span>
       </div>
-      <div className="flex flex-wrap gap-1.5">
-        <Button variant="primary" className="px-3 py-1 text-xs" onClick={onUse}>
+      <div className="flex items-center gap-2">
+        <Button variant="primary" size="sm" className="flex-1" onClick={onUse}>
           {t('spreadsPage.use')}
         </Button>
-        <Button variant="ghost" className="px-3 py-1 text-xs" onClick={onDuplicate}>
-          {t('spreadsPage.duplicate')}
-        </Button>
-        <Button variant="ghost" className="px-3 py-1 text-xs" onClick={onExport}>
-          {t('common.export')}
-        </Button>
-        {onDelete && (
-          <Button variant="ghost" className="px-3 py-1 text-xs text-red-300" onClick={onDelete}>
-            {t('common.delete')}
-          </Button>
-        )}
+        <OverflowMenu>
+          <MenuItem onClick={onDuplicate}>{t('spreadsPage.duplicate')}</MenuItem>
+          <MenuItem onClick={onExport}>{t('common.export')}</MenuItem>
+          {onDelete && (
+            <MenuItem onClick={onDelete} danger>
+              {t('common.delete')}
+            </MenuItem>
+          )}
+        </OverflowMenu>
       </div>
     </div>
+  )
+}
+
+function OverflowMenu({ children }: { children: React.ReactNode }) {
+  return (
+    <details className="relative shrink-0">
+      <summary className="flex h-9 w-9 cursor-pointer touch-manipulation list-none items-center justify-center rounded-full text-lg text-ink-300 transition-colors hover:bg-night-700/60 hover:text-ink-100 [&::-webkit-details-marker]:hidden">
+        ⋯
+      </summary>
+      <div className="absolute right-0 z-10 mt-1 flex min-w-32 flex-col overflow-hidden rounded-xl border border-night-600/70 bg-night-800 py-1 shadow-2xl">
+        {children}
+      </div>
+    </details>
+  )
+}
+
+function MenuItem({
+  onClick,
+  danger,
+  children,
+}: {
+  onClick: () => void
+  danger?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      className={
+        'px-3 py-2 text-left text-sm transition-colors hover:bg-night-700/70 ' +
+        (danger ? 'text-reversed' : 'text-ink-200')
+      }
+      onClick={(e) => {
+        e.currentTarget.closest('details')?.removeAttribute('open')
+        onClick()
+      }}
+    >
+      {children}
+    </button>
   )
 }

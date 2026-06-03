@@ -63,8 +63,8 @@ export function InterpretationPanel({ onInterpret, onFollowUp, onCancel }: Props
         <div>
           {streaming ? <Markdown>{streaming}</Markdown> : null}
           <div className="mt-2 flex items-center gap-3">
-            <span className="animate-pulse text-sm text-mystic-200">{t('reading.revealing')}</span>
-            <Button variant="ghost" className="px-3 py-1 text-xs" onClick={onCancel}>
+            <span className="animate-pulse text-sm text-gold-300">{t('reading.revealing')}</span>
+            <Button variant="ghost" size="sm" onClick={onCancel}>
               {t('common.cancel')}
             </Button>
           </div>
@@ -72,10 +72,10 @@ export function InterpretationPanel({ onInterpret, onFollowUp, onCancel }: Props
       )}
 
       {error && (
-        <div className="mt-3 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
+        <div className="mt-3 rounded-lg border border-reversed/40 bg-reversed/10 p-3 text-sm text-reversed">
           {error}
           <div className="mt-2">
-            <Button variant="secondary" className="px-3 py-1 text-xs" onClick={onInterpret}>
+            <Button variant="secondary" size="sm" onClick={onInterpret}>
               {t('reading.interpret')}
             </Button>
           </div>
@@ -89,7 +89,7 @@ export function InterpretationPanel({ onInterpret, onFollowUp, onCancel }: Props
             <select
               value={focus}
               onChange={(e) => setFocus(e.target.value)}
-              className="rounded-lg border border-night-600 bg-night-900/70 p-2 text-sm text-ink-100 outline-none focus:border-mystic-400"
+              className="min-h-11 rounded-lg border border-night-600 bg-night-900/70 px-3 text-sm text-ink-100 outline-none focus:border-gold-400"
             >
               <option value="">{t('reading.focusGeneral')}</option>
               {spread.positions.map((p) => (
@@ -105,7 +105,7 @@ export function InterpretationPanel({ onInterpret, onFollowUp, onCancel }: Props
                 if (e.key === 'Enter') submitFollowup()
               }}
               placeholder={t('reading.followupPlaceholder')}
-              className="flex-1 rounded-lg border border-night-600 bg-night-900/70 p-2 text-sm text-ink-100 outline-none focus:border-mystic-400"
+              className="min-h-11 flex-1 rounded-lg border border-night-600 bg-night-900/70 px-3 text-sm text-ink-100 outline-none focus:border-gold-400"
             />
             <Button onClick={submitFollowup} disabled={!followupQ.trim()}>
               {t('reading.askFollowup')}

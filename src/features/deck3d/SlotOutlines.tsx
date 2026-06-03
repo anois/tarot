@@ -16,7 +16,8 @@ export function SlotOutlines() {
     [spread, plane],
   )
 
-  if (!spread || !plane || (phase !== 'idle' && phase !== 'picking')) return null
+  // Only while picking — the idle screen keeps the deck as its sole hero.
+  if (!spread || !plane || phase !== 'picking') return null
 
   const filled = new Set(picked.map((_, i) => i))
   const sorted = [...spread.positions].sort((a, b) => a.index - b.index)
@@ -29,7 +30,7 @@ export function SlotOutlines() {
         return (
           <mesh key={pos.id} position={t.position} rotation={t.rotation} scale={t.scale}>
             <planeGeometry args={[CARD_W, CARD_H]} />
-            <meshBasicMaterial color="#e8c468" transparent opacity={isFilled ? 0 : 0.05} depthWrite={false} />
+            <meshBasicMaterial color="#f4dc9c" transparent opacity={isFilled ? 0 : 0.05} depthWrite={false} />
             <Edges color="#d9a441" />
           </mesh>
         )

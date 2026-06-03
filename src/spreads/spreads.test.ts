@@ -13,7 +13,22 @@ describe('built-in spreads', () => {
   it('ships the expected built-ins', () => {
     const ids = BUILTIN_SPREADS.map((s) => s.id).sort()
     expect(ids).toEqual(
-      ['celtic-cross', 'horseshoe', 'relationship', 'single', 'three-card', 'year-ahead'].sort(),
+      [
+        'celtic-cross',
+        'chakra',
+        'decision',
+        'horseshoe',
+        'mind-body-spirit',
+        'pentagram',
+        'relationship',
+        'relationship-cross',
+        'single',
+        'situation-action-outcome',
+        'three-card',
+        'year-ahead',
+        'yes-no-clarifier',
+        'zodiac-houses',
+      ].sort(),
     )
   })
 

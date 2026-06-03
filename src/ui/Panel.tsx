@@ -17,7 +17,9 @@ export function Panel({ className, children }: { className?: string; children: R
 export function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-6">
-      <h1 className="font-display text-3xl text-gold-300">{title}</h1>
+      <h1 className="font-display text-[clamp(1.6rem,5vw,2.1rem)] leading-tight text-gold-300">
+        {title}
+      </h1>
       {subtitle && <p className="mt-1 text-sm text-ink-300">{subtitle}</p>}
     </div>
   )

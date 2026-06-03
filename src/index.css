@@ -1,24 +1,48 @@
 @import 'tailwindcss';
 
-/* ── Mystical cosmic theme tokens (Tailwind v4 @theme) ────────────────── */
+/* ── 烛光秘典 · Candlelit Grimoire theme tokens (Tailwind v4 @theme) ────────
+   Deep aubergine-ink ground · antique-brass candlelight accent ·
+   parchment-cream ink. Token NAMES are preserved (night/gold/ink/mystic) so
+   existing utility classes keep working; only the VALUES changed. */
 @theme {
-  --color-night-950: #07061a;
-  --color-night-900: #0b0a1a;
-  --color-night-800: #131129;
-  --color-night-700: #1d1a3a;
-  --color-night-600: #2a2552;
-  --color-mystic-400: #7c6cff;
-  --color-mystic-300: #9d8cff;
-  --color-mystic-200: #c3b8ff;
-  --color-gold-500: #d9a441;
-  --color-gold-400: #e8c468;
-  --color-gold-300: #f3dca0;
-  --color-ink-100: #e9e6ff;
-  --color-ink-300: #b8b2da;
-  --color-ink-500: #837ca6;
+  /* aubergine-ink surfaces (warm near-black → plum borders) */
+  --color-night-950: #0e0a13;
+  --color-night-900: #17111d;
+  --color-night-800: #211829;
+  --color-night-700: #2d2235;
+  --color-night-600: #3c2f44;
 
-  --font-display: 'Cinzel', 'Noto Serif SC', serif;
-  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  /* antique brass — the hero / candlelight accent */
+  --color-gold-500: #c9952f;
+  --color-gold-400: #dcab44;
+  --color-gold-300: #ecc66a;
+  --color-gold-200: #f4dc9c;
+
+  /* parchment-cream text ramp (200/400 were previously referenced-but-undefined) */
+  --color-ink-100: #f3ead6;
+  --color-ink-200: #e6dabf;
+  --color-ink-300: #cbbd9e;
+  --color-ink-400: #a99e82;
+  --color-ink-500: #857c66;
+
+  /* amethyst — demoted to a quiet, cool secondary accent (focus rings, links) */
+  --color-mystic-400: #9b7fd4;
+  --color-mystic-300: #b6a0e0;
+  --color-mystic-200: #d0c2ee;
+
+  /* semantic tokens (replace scattered raw emerald/red/amber) */
+  --color-upright: #6fcf97;
+  --color-reversed: #e2786f;
+  --color-warning: #e0b34a;
+
+  --font-display: 'Cinzel', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC',
+    system-ui, sans-serif;
+
+  /* candle-glow + staggered reveal */
+  --animate-candle: candle 4.5s ease-in-out infinite;
+  --animate-rise: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 :root {
@@ -34,8 +58,8 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(1200px 800px at 50% -10%, var(--color-night-700), transparent 60%),
-    radial-gradient(900px 600px at 90% 110%, var(--color-night-600), transparent 55%),
+    radial-gradient(1100px 760px at 50% -12%, var(--color-night-700), transparent 62%),
+    radial-gradient(820px 560px at 88% 112%, #2a1f33, transparent 58%),
     var(--color-night-950);
   color: var(--color-ink-100);
   font-family: var(--font-sans);
@@ -43,29 +67,79 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* subtle starfield using layered radial dots */
+/* warm gold dust motes — candlelit dark */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1.5px 1.5px at 40% 80%, rgba(227, 196, 104, 0.4), transparent),
-    radial-gradient(1px 1px at 85% 15%, rgba(255, 255, 255, 0.4), transparent);
+    radial-gradient(1px 1px at 20% 30%, rgba(244, 220, 156, 0.5), transparent),
+    radial-gradient(1px 1px at 72% 62%, rgba(236, 198, 106, 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 40% 82%, rgba(217, 164, 65, 0.4), transparent),
+    radial-gradient(1px 1px at 86% 16%, rgba(243, 234, 214, 0.32), transparent);
   background-size:
-    400px 400px,
-    300px 300px,
-    500px 500px,
-    350px 350px;
-  opacity: 0.6;
+    420px 420px,
+    320px 320px,
+    520px 520px,
+    360px 360px;
+  opacity: 0.55;
   z-index: 0;
+}
+
+/* paper grain + edge vignette — illuminated-manuscript atmosphere */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(130% 130% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.55) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  background-size:
+    100% 100%,
+    160px 160px;
+  opacity: 0.35;
+  mix-blend-mode: soft-light;
+}
+
+/* gold hairline rule */
+.rule-gold {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-gold-400) 60%, transparent),
+    transparent
+  );
+}
+
+@keyframes candle {
+  0%,
+  100% {
+    box-shadow: 0 0 18px -4px color-mix(in srgb, var(--color-gold-400) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 30px 0 color-mix(in srgb, var(--color-gold-300) 70%, transparent);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* LLM markdown output */
 .md {
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--color-ink-100);
 }
 .md h1,
@@ -105,9 +179,10 @@ body::before {
 }
 .md em {
   color: var(--color-mystic-200);
+  font-style: italic;
 }
 .md blockquote {
-  border-left: 3px solid var(--color-mystic-400);
+  border-left: 3px solid var(--color-gold-500);
   padding-left: 0.9em;
   color: var(--color-ink-300);
   margin: 0.6em 0;
@@ -116,6 +191,15 @@ body::before {
   border: none;
   border-top: 1px solid var(--color-night-600);
   margin: 1em 0;
+}
+
+/* hide scrollbars on horizontal snap rails while keeping scrollability */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

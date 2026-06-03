@@ -2,17 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useSprings } from '@react-spring/three'
+import { easing } from 'maath'
 import { useDivination } from '@/features/divination/divination.store'
 import { usePrefs } from '@/store/prefs.store'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import { getCard } from '@/deck/cards'
-import type { Card as CardType } from '@/deck/types'
 import { Card, type CardSpring } from './Card'
 import { getBackTexture, getMinimalFaceTexture } from './skins'
 import { useDeckFronts } from './useDeckFronts'
 import {
   coverflowTransform,
   discardTransform,
+  idleStackTransform,
   scatterTransform,
   slotTransform,
   spreadCardScale,
@@ -22,10 +23,17 @@ import {
   type Vec3,
 } from './layout'
 
+const DRAG_SENSITIVITY = 1.15 // world units dragged per card-step
+
 /**
  * Unified deck: one set of meshes drives the whole flow — stack → shuffle →
  * coverflow browse → pick (card flies into its spread slot, face-down) → reveal
  * (flip face-up in place with reversed). The card you pick IS the card that flips.
+ *
+ * Interaction is a carousel that behaves identically on desktop and touch:
+ * drag/swipe (or wheel, or the HUD ◀ ▶) scrubs the focus; a tap picks the
+ * centered card. Faces are NEVER shown until reveal — only a drawn card in the
+ * revealing/done phase gets its real front texture (otherwise the back shows).
  */
 export function Deck() {
   const phase = useDivination((s) => s.phase)
@@ -33,8 +41,12 @@ export function Deck() {
   const picked = useDivination((s) => s.picked)
   const spread = useDivination((s) => s.spread)
   const drawn = useDivination((s) => s.drawn)
-  const pick = useDivination((s) => s.pick)
+  const centered = useDivination((s) => s.centered)
+  const setCentered = useDivination((s) => s.setCentered)
+  const stepCentered = useDivination((s) => s.stepCentered)
+  const pickCentered = useDivination((s) => s.pickCentered)
   const selectCard = useDivination((s) => s.selectCard)
+  const startShuffle = useDivination((s) => s.startShuffle)
   const finishShuffle = useDivination((s) => s.finishShuffle)
   const finishReveal = useDivination((s) => s.finishReveal)
   const reduced = useReducedMotion()
@@ -44,11 +56,6 @@ export function Deck() {
   const back = useMemo(() => getBackTexture(deckBack), [deckBack])
   const fronts = useDeckFronts()
   const n = deckOrder.length
-
-  const frontFor = (card: CardType | undefined): THREE.Texture | undefined => {
-    if (!card) return undefined
-    return cardFace === 'minimal' ? getMinimalFaceTexture(card) : fronts.get(card.imageKey)
-  }
 
   const plane = useMemo(() => (spread ? spreadPlane(spread) : null), [spread])
   const cardScale = useMemo(
@@ -61,9 +68,6 @@ export function Deck() {
   )
   const posById = useMemo(() => new Map(sortedPositions.map((p) => [p.id, p])), [sortedPositions])
   const drawnByCard = useMemo(() => new Map(drawn.map((d) => [d.cardId, d])), [drawn])
-
-  const [centered, setCentered] = useState(0)
-  const centeredRef = useRef(0)
 
   // Pre-load image faces of picked / drawn cards (classic style only).
   useEffect(() => {
@@ -98,7 +102,8 @@ export function Deck() {
   }, [picked])
 
   const targetFor = (i: number): Transform => {
-    if (phase === 'idle' || phase === 'shuffling') return stackTransform(i)
+    if (phase === 'idle') return idleStackTransform(i, n)
+    if (phase === 'shuffling') return stackTransform(i)
     const cardId = deckOrder[i]
     if (phase === 'revealing' || phase === 'done') {
       const d = drawnByCard.get(cardId)
@@ -117,9 +122,24 @@ export function Deck() {
   }
 
   const [springs, api] = useSprings(n, (i) => ({
-    ...stackTransform(i),
+    ...idleStackTransform(i, n),
     config: { tension: 210, friction: 24 },
   }))
+
+  // Gentle "breathing" float on the idle hero pile (eased back to rest otherwise).
+  const floatRef = useRef<THREE.Group>(null)
+  useFrame((state, dt) => {
+    const g = floatRef.current
+    if (!g) return
+    if (phase === 'idle' && !reduced) {
+      const tm = state.clock.elapsedTime
+      easing.damp3(g.position, [0, Math.sin(tm * 0.9) * 0.12, 0], 0.4, dt)
+      easing.dampE(g.rotation, [Math.sin(tm * 0.6) * 0.03, Math.sin(tm * 0.45) * 0.05, 0], 0.5, dt)
+    } else {
+      easing.damp3(g.position, [0, 0, 0], 0.3, dt)
+      easing.dampE(g.rotation, [0, 0, 0], 0.3, dt)
+    }
+  })
 
   const timers = useRef<number[]>([])
 
@@ -128,8 +148,6 @@ export function Deck() {
     timers.current.forEach(clearTimeout)
     timers.current = []
     if (phase === 'shuffling') {
-      centeredRef.current = Math.floor(n / 2)
-      setCentered(centeredRef.current)
       if (reduced) {
         api.start((i) => ({ ...stackTransform(i), config: { tension: 260, friction: 30 } }))
         timers.current.push(window.setTimeout(() => finishShuffle(), 450))
@@ -177,54 +195,100 @@ export function Deck() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [centered, picked, phase])
 
-  // Mouse-x scrubs the coverflow focus (continuous, throttled to integer steps).
-  useFrame((state) => {
-    if (phase !== 'picking' || n <= 1) return
-    const t = state.pointer.x * 0.6 + 0.5
-    const target = Math.max(0, Math.min(n - 1, Math.round(t * (n - 1))))
-    if (target !== centeredRef.current) {
-      centeredRef.current = target
-      setCentered(target)
-    }
-  })
-
-  function pickCentered(e: ThreeEvent<MouseEvent>) {
+  // ── carousel input (drag/swipe to scrub, wheel on desktop, tap to pick) ──
+  const dragRef = useRef<{ x: number; start: number; moved: boolean } | null>(null)
+  function onDown(e: ThreeEvent<PointerEvent>) {
     e.stopPropagation()
-    if (phase !== 'picking') return
-    pick(deckOrder[centeredRef.current])
+    dragRef.current = { x: e.point.x, start: centered, moved: false }
+  }
+  function onMove(e: ThreeEvent<PointerEvent>) {
+    const dr = dragRef.current
+    if (!dr) return
+    const dx = e.point.x - dr.x
+    if (Math.abs(dx) > 0.12) dr.moved = true
+    setCentered(dr.start - dx / DRAG_SENSITIVITY)
+  }
+  function onUp() {
+    const dr = dragRef.current
+    dragRef.current = null
+    if (dr && !dr.moved) pickCentered() // a tap (no drag) picks the centered card
+  }
+  function onWheel(e: ThreeEvent<WheelEvent>) {
+    e.stopPropagation()
+    stepCentered(e.deltaY > 0 ? 1 : -1)
   }
 
   return (
     <group>
-      {/* invisible click-catcher (picking only): click anywhere takes the centered card */}
+      {/* carousel surface (picking only): drag/swipe scrubs, wheel steps, tap picks */}
       {phase === 'picking' && (
-        <mesh position={[0, 0, 4.6]} onClick={pickCentered}>
+        <mesh
+          position={[0, 0, 4.6]}
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerLeave={onUp}
+          onWheel={onWheel}
+        >
           <planeGeometry args={[60, 40]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       )}
 
+      {phase === 'idle' && <IdleGlow />}
       {phase === 'picking' && <CenterGlow />}
       {burst && <BurstRing key={burst.key} position={burst.pos} onDone={() => setBurst(null)} />}
 
-      {springs.map((spring, i) => {
-        const card = getCard(deckOrder[i])
-        const d = phase === 'done' ? drawnByCard.get(deckOrder[i]) : undefined
-        return (
-          <Card
-            key={i}
-            spring={spring as unknown as CardSpring}
-            backTexture={back}
-            frontTexture={frontFor(card)}
-            interactive={!!d}
-            onSelect={(e) => {
-              e.stopPropagation()
-              if (d) selectCard(d.positionId)
-            }}
-          />
-        )
-      })}
+      <group ref={floatRef}>
+        {springs.map((spring, i) => {
+          const card = getCard(deckOrder[i])
+          const drawnEntry = drawnByCard.get(deckOrder[i])
+          const revealing = phase === 'revealing' || phase === 'done'
+          // Faces are hidden until reveal: only a drawn card, while revealing/done,
+          // gets its real front texture — everything else shows the back.
+          const front =
+            card && drawnEntry && revealing
+              ? cardFace === 'minimal'
+                ? getMinimalFaceTexture(card)
+                : fronts.get(card.imageKey)
+              : undefined
+          const idle = phase === 'idle'
+          const clickable = idle || (phase === 'done' && !!drawnEntry)
+          return (
+            <Card
+              key={i}
+              spring={spring as unknown as CardSpring}
+              backTexture={back}
+              frontTexture={front}
+              interactive={clickable}
+              onSelect={(e) => {
+                e.stopPropagation()
+                if (idle) startShuffle()
+                else if (drawnEntry) selectCard(drawnEntry.positionId)
+              }}
+            />
+          )
+        })}
+      </group>
     </group>
+  )
+}
+
+/** Soft aura behind the idle hero pile — signals the deck is alive & tappable. */
+function IdleGlow() {
+  const ref = useRef<THREE.Mesh>(null)
+  useFrame((state) => {
+    if (!ref.current) return
+    const p = 1 + Math.sin(state.clock.elapsedTime * 1.4) * 0.05
+    ref.current.scale.set(p, p, 1)
+    ;(ref.current.material as THREE.MeshBasicMaterial).opacity =
+      0.16 + Math.sin(state.clock.elapsedTime * 1.4) * 0.05
+  })
+  return (
+    <mesh ref={ref} position={[0, 0.7, 0.1]}>
+      <circleGeometry args={[2.4, 64]} />
+      <meshBasicMaterial color="#f4dc9c" transparent opacity={0.16} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
   )
 }
 
@@ -241,7 +305,7 @@ function CenterGlow() {
   return (
     <mesh ref={ref} position={[0, -2.05, 3.2]}>
       <circleGeometry args={[1.4, 48]} />
-      <meshBasicMaterial color="#e8c468" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#f4dc9c" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
     </mesh>
   )
 }
@@ -263,7 +327,7 @@ function BurstRing({ position, onDone }: { position: Vec3; onDone: () => void })
   return (
     <mesh ref={ref} position={position}>
       <ringGeometry args={[0.5, 0.62, 56]} />
-      <meshBasicMaterial color="#e8c468" transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#f4dc9c" transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} />
     </mesh>
   )
 }

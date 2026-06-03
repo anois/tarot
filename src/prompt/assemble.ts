@@ -3,6 +3,7 @@ import type { DrawnCard } from '@/mechanics/types'
 import type { ChatMessage } from '@/llm/types'
 import type { ReadingTemplate, ReadingTurn } from '@/reading/types'
 import { getDeckCard } from '@/deck/deck'
+import { getMeaningZh } from '@/deck/meaningsZh'
 import { computeBoardStats } from '@/reading/boardStats'
 import { FOLLOWUP_SYSTEM, SYSTEM_PROMPTS } from './templates'
 
@@ -28,11 +29,15 @@ export function buildContextBlock(spread: Spread, drawn: DrawnCard[]): string {
     const card = getDeckCard(d.cardId)
     if (!pos || !card) continue
     const orient = d.reversed ? '逆位' : '正位'
-    const meanings = (d.reversed ? card.meaning.reversed : card.meaning.upright).slice(0, MAX_MEANINGS)
+    const zh = getMeaningZh(d.cardId)
+    const keywords = zh?.keywords ?? card.meaning.keywords
+    const meanings = (
+      d.reversed ? (zh?.reversed ?? card.meaning.reversed) : (zh?.upright ?? card.meaning.upright)
+    ).slice(0, MAX_MEANINGS)
     lines.push('')
     lines.push(`${d.index}. 位置「${pos.label}」（位置含义：${pos.meaning}）`)
-    lines.push(`   牌：${card.nameZh}（${card.nameEn}）— ${orient}`)
-    lines.push(`   关键词：${card.meaning.keywords.join('、')}`)
+    lines.push(`   牌：${card.nameZh} — ${orient}`)
+    lines.push(`   关键词：${keywords.join('、')}`)
     lines.push(`   ${orient}牌义参考：${meanings.join('；')}`)
     if (pos.prompt) {
       lines.push(`   该位置提示：${pos.prompt.replaceAll('{card}', card.nameZh)}`)
