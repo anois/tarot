@@ -9,6 +9,7 @@ import { InterpretationPanel } from '@/features/divination/components/Interpreta
 import { CardDetailPanel } from '@/features/divination/components/CardDetailPanel'
 import { SpreadCarousel } from '@/features/divination/components/SpreadCarousel'
 import { ControlsSheet } from '@/features/divination/components/ControlsSheet'
+import { ShareSheet } from '@/features/divination/components/ShareSheet'
 import { ActionBar } from '@/features/divination/components/ActionBar'
 import { getBuiltinSpread } from '@/spreads/registry'
 import { getCard } from '@/deck/cards'
@@ -17,6 +18,7 @@ import type { Spread } from '@/spreads/types'
 export default function ReadingRoute() {
   const { t } = useTranslation()
   const [controlsOpen, setControlsOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
 
   const phase = useDivination((s) => s.phase)
   const spread = useDivination((s) => s.spread)
@@ -106,6 +108,7 @@ export default function ReadingRoute() {
         onConfirm={confirm}
         onReset={reset}
         onSkip={() => (phase === 'shuffling' ? finishShuffle() : finishReveal())}
+        onShare={() => setShareOpen(true)}
       />
 
       {phase === 'done' && (
@@ -116,6 +119,7 @@ export default function ReadingRoute() {
       )}
 
       <ControlsSheet open={controlsOpen} onClose={() => setControlsOpen(false)} />
+      <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} />
       <CardDetailPanel />
     </div>
   )

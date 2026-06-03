@@ -18,6 +18,7 @@ interface Props {
   onConfirm: () => void
   onReset: () => void
   onSkip: () => void
+  onShare: () => void
 }
 
 export function ActionBar(p: Props) {
@@ -104,8 +105,11 @@ export function ActionBar(p: Props) {
       )}
 
       {p.phase === 'done' && (
-        <div className="flex justify-center">
-          <Button variant="secondary" size="md" onClick={p.onReset}>
+        <div className="flex items-center justify-center gap-2">
+          <Button size="md" className="flex-1 sm:flex-none sm:px-8" onClick={p.onShare}>
+            {t('reading.share')}
+          </Button>
+          <Button variant="secondary" size="md" className="flex-1 sm:flex-none sm:px-8" onClick={p.onReset}>
             {t('reading.reset')}
           </Button>
         </div>

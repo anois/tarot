@@ -27,6 +27,7 @@
     "options": "选项",
     "questionTapHint": "点按设置你的问题",
     "skip": "跳过",
+    "share": "分享图片",
     "prev": "上一张",
     "next": "下一张",
     "pickThis": "抽取这张",
@@ -73,6 +74,16 @@
       "overall": "整体综合分析",
       "deepdive": "深入追问"
     }
+  },
+  "share": {
+    "title": "分享占卜图片",
+    "styleSpread": "仅牌阵",
+    "styleFull": "牌阵 + 解读",
+    "needInterp": "尚未生成解读，将分享仅牌阵的图片。",
+    "qrHint": "图片底部附二维码，扫码即可访问项目主页。",
+    "generating": "生成图片中…",
+    "download": "下载图片",
+    "shareBtn": "分享"
   },
   "settings": {
     "title": "大模型设置（BYOK）",
