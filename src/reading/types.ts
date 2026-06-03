@@ -1,7 +1,7 @@
 import type { DrawnCard } from '@/mechanics/types'
 import type { Spread } from '@/spreads/types'
 
-export type ReadingTemplate = 'structured' | 'narrative' | 'quick' | 'deepdive'
+export type ReadingTemplate = 'structured' | 'narrative' | 'quick' | 'deepdive' | 'overall'
 
 export interface ReadingTurn {
   role: 'reading' | 'followup'

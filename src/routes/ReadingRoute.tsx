@@ -9,13 +9,16 @@ import { Scene } from '@/features/deck3d/Scene'
 import { useDivination } from '@/features/divination/divination.store'
 import { useInterpret } from '@/features/divination/useInterpret'
 import { InterpretationPanel } from '@/features/divination/components/InterpretationPanel'
+import { CardDetailPanel } from '@/features/divination/components/CardDetailPanel'
+import { usePrefs } from '@/store/prefs.store'
+import { BACK_STYLES, CLOTH_STYLES, FACE_STYLES } from '@/features/deck3d/skins'
 import { BUILTIN_SPREADS, getBuiltinSpread } from '@/spreads/registry'
 import { listStoredSpreads, getStoredSpread } from '@/spreads/repo'
 import { getCard } from '@/deck/cards'
 import type { ReadingTemplate } from '@/reading/types'
 import type { Spread } from '@/spreads/types'
 
-const INITIAL_TEMPLATES: ReadingTemplate[] = ['structured', 'narrative', 'quick']
+const INITIAL_TEMPLATES: ReadingTemplate[] = ['structured', 'narrative', 'quick', 'overall']
 
 interface NavState {
   spreadId?: string
@@ -45,6 +48,13 @@ export default function ReadingRoute() {
   const confirm = useDivination((s) => s.confirm)
   const reset = useDivination((s) => s.reset)
   const { interpret, followUp, cancel } = useInterpret()
+
+  const deckBack = usePrefs((s) => s.deckBack)
+  const cardFace = usePrefs((s) => s.cardFace)
+  const tableCloth = usePrefs((s) => s.tableCloth)
+  const setDeckBack = usePrefs((s) => s.setDeckBack)
+  const setCardFace = usePrefs((s) => s.setCardFace)
+  const setTableCloth = usePrefs((s) => s.setTableCloth)
 
   // Initial spread key: honor navigation from the Spreads page, else current/default.
   const [selKey, setSelKey] = useState<string>(() => {
@@ -153,6 +163,30 @@ export default function ReadingRoute() {
           {tooManyForMajor && (
             <p className="mt-1 text-xs text-amber-300">{t('reading.tooManyForMajor')}</p>
           )}
+
+          <div className="mt-4 border-t border-night-600/50 pt-3">
+            <span className="mb-2 block text-sm text-ink-300">{t('reading.appearance')}</span>
+            <div className="grid grid-cols-3 gap-2">
+              <StyleSelect
+                label={t('reading.deckBack')}
+                value={deckBack}
+                options={BACK_STYLES}
+                onChange={(v) => setDeckBack(v as typeof deckBack)}
+              />
+              <StyleSelect
+                label={t('reading.cardFace')}
+                value={cardFace}
+                options={FACE_STYLES}
+                onChange={(v) => setCardFace(v as typeof cardFace)}
+              />
+              <StyleSelect
+                label={t('reading.tableCloth')}
+                value={tableCloth}
+                options={CLOTH_STYLES}
+                onChange={(v) => setTableCloth(v as typeof tableCloth)}
+              />
+            </div>
+          </div>
         </div>
 
         {phase === 'done' && drawn.length > 0 && spread && (
@@ -185,6 +219,7 @@ export default function ReadingRoute() {
       {phase === 'done' && (
         <InterpretationPanel onInterpret={interpret} onFollowUp={followUp} onCancel={cancel} />
       )}
+      <CardDetailPanel />
     </div>
   )
 }
@@ -233,6 +268,11 @@ function Hud({
             {t('reading.revealing')}
           </span>
         )}
+        {phase === 'done' && (
+          <span className="rounded-full bg-night-950/70 px-3 py-1 text-xs text-ink-300">
+            {t('reading.clickCardHint')}
+          </span>
+        )}
       </div>
 
       {/* actions — bottom */}
@@ -264,6 +304,35 @@ function Hud({
         </div>
       </div>
     </>
+  )
+}
+
+function StyleSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: readonly { id: string; name: string }[]
+  onChange: (v: string) => void
+}) {
+  return (
+    <label className="flex flex-col gap-1 text-xs text-ink-400">
+      {label}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-md border border-night-600 bg-night-900/70 p-1.5 text-xs text-ink-100 outline-none focus:border-mystic-400"
+      >
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.name}
+          </option>
+        ))}
+      </select>
+    </label>
   )
 }
 

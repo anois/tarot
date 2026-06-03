@@ -31,6 +31,10 @@
     "interpretSoon": "解读（接入大模型后开启）",
     "includeReversed": "包含逆位",
     "majorOnly": "仅大阿卡纳（22 张）",
+    "appearance": "外观样式",
+    "deckBack": "卡背",
+    "cardFace": "卡面",
+    "tableCloth": "桌布",
     "tooManyForMajor": "该牌阵需要超过 22 张牌，无法仅用大阿卡纳。",
     "drawnTitle": "抽到的牌",
     "upright": "正位",
@@ -40,10 +44,24 @@
     "focusGeneral": "整体",
     "followupPlaceholder": "例如：这对我的财务具体意味着什么？如何化解逆位？",
     "askFollowup": "追问",
+    "clickCardHint": "点击任意牌，查看其星象、象征与故事",
+    "cardDetail": {
+      "position": "位置",
+      "element": "元素",
+      "astrology": "星象",
+      "numerology": "数字",
+      "symbolism": "象征",
+      "story": "故事",
+      "keywords": "关键词",
+      "meaning": "牌义",
+      "interpret": "结合此位置与问题深入解读",
+      "reinterpret": "重新解读"
+    },
     "templates": {
       "structured": "结构化逐牌",
       "narrative": "故事化叙事",
       "quick": "简短速答",
+      "overall": "整体综合分析",
       "deepdive": "深入追问"
     }
   },

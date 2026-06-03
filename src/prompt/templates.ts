@@ -28,10 +28,21 @@ const QUICK = `${BASE}
 - 随后用 1–3 句话简要说明理由，点出最关键的一两张牌即可。
 保持简洁，总长度控制在 120 字以内。`
 
+const OVERALL = `${BASE}
+
+这是一次"整体牌面综合分析"。除了单牌牌义，更要从整副牌的"格局特征"切入——下方会给出统计特征（元素分布、正逆位比例、大阿卡纳占比、宫廷牌数量等）。请按以下结构输出：
+## 牌面格局
+解读这些整体特征意味着什么样的能量基调与态势（例如某元素偏重、逆位偏多、大牌占多数各自说明什么）。
+## 关键牌与脉络
+挑出最关键的 1–3 张牌，结合其牌义与所在位置，串起事件的主线。
+## 整体走向与建议
+综合"格局"与"单牌"，给出整体趋势的判断，并给出 2–4 条务实、可执行的建议。`
+
 export const SYSTEM_PROMPTS: Record<Exclude<ReadingTemplate, 'deepdive'>, string> = {
   structured: STRUCTURED,
   narrative: NARRATIVE,
   quick: QUICK,
+  overall: OVERALL,
 }
 
 export const FOLLOWUP_SYSTEM = `${BASE}

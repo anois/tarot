@@ -33,6 +33,8 @@ interface DivinationState {
   interpretError: string | null
   /** Stable id for the current reading record (set when cards are confirmed). */
   readingId: string | null
+  /** Which revealed card's detail panel is open (positionId), or null. */
+  selectedPositionId: string | null
 
   setSpread: (s: Spread | null) => void
   setQuestion: (q: string) => void
@@ -53,6 +55,7 @@ interface DivinationState {
   appendStream: (text: string) => void
   commitTurn: (turn: ReadingTurn) => void
   failInterpret: (message: string) => void
+  selectCard: (positionId: string | null) => void
 }
 
 export const useDivination = create<DivinationState>((set, get) => ({
@@ -71,6 +74,7 @@ export const useDivination = create<DivinationState>((set, get) => ({
   interpreting: false,
   interpretError: null,
   readingId: null,
+  selectedPositionId: null,
 
   setSpread: (spread) =>
     set({ spread, phase: 'idle', picked: [], drawn: [], turns: [], streaming: null, readingId: null }),
@@ -140,6 +144,7 @@ export const useDivination = create<DivinationState>((set, get) => ({
       interpreting: false,
       interpretError: null,
       readingId: null,
+      selectedPositionId: null,
     }),
 
   beginInterpret: () => set({ interpreting: true, streaming: '', interpretError: null }),
@@ -148,6 +153,7 @@ export const useDivination = create<DivinationState>((set, get) => ({
     set((s) => ({ turns: [...s.turns, turn], streaming: null, interpreting: false })),
   failInterpret: (message) =>
     set({ interpreting: false, streaming: null, interpretError: message }),
+  selectCard: (selectedPositionId) => set({ selectedPositionId }),
 }))
 
 // Dev-only handle for manual/automated testing in the browser console.

@@ -3,6 +3,7 @@ import type { DrawnCard } from '@/mechanics/types'
 import type { ChatMessage } from '@/llm/types'
 import type { ReadingTemplate, ReadingTurn } from '@/reading/types'
 import { getDeckCard } from '@/deck/deck'
+import { computeBoardStats } from '@/reading/boardStats'
 import { FOLLOWUP_SYSTEM, SYSTEM_PROMPTS } from './templates'
 
 export interface ReadingContext {
@@ -49,11 +50,26 @@ function questionBlock(question: string): string {
   ].join('\n')
 }
 
+/** A summary of the whole board's pattern, for the overall-synthesis reading. */
+export function buildStatsBlock(drawn: ReadingContext['drawn']): string {
+  const s = computeBoardStats(drawn)
+  const lines = ['整体牌面特征：', ...s.features.map((f) => `- ${f}`)]
+  lines.push(
+    `（统计：共 ${s.total} 张；正位 ${s.upright} / 逆位 ${s.reversed}；大牌 ${s.major} / 小牌 ${s.minor}；` +
+      `元素 火${s.elements['火']}·水${s.elements['水']}·风${s.elements['风']}·土${s.elements['土']}）`,
+  )
+  return lines.join('\n')
+}
+
 /** Build the messages for the initial reading. */
 export function buildReadingMessages(ctx: ReadingContext): ChatMessage[] {
   const template = ctx.template === 'deepdive' ? 'structured' : ctx.template
   const system = SYSTEM_PROMPTS[template]
-  const user = `${questionBlock(ctx.question)}\n\n${buildContextBlock(ctx.spread, ctx.drawn)}`
+  const context = buildContextBlock(ctx.spread, ctx.drawn)
+  const user =
+    ctx.template === 'overall'
+      ? `${questionBlock(ctx.question)}\n\n${buildStatsBlock(ctx.drawn)}\n\n${context}`
+      : `${questionBlock(ctx.question)}\n\n${context}`
   return [
     { role: 'system', content: system },
     { role: 'user', content: user },

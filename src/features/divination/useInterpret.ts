@@ -15,7 +15,10 @@ export function useInterpret() {
   const abortRef = useRef<AbortController | null>(null)
 
   const run = useCallback(
-    async (kind: 'reading' | 'followup', followup?: { question: string; focusLabel?: string }) => {
+    async (
+      kind: 'reading' | 'followup',
+      followup?: { question: string; focusLabel?: string; focusPositionId?: string },
+    ) => {
       const div = useDivination.getState()
       const { config } = useLLMConfig.getState()
       if (!div.spread || div.drawn.length === 0 || !config.apiKey) return
@@ -66,7 +69,7 @@ export function useInterpret() {
         role: kind,
         template,
         question: followup?.question,
-        focusPositionId: undefined,
+        focusPositionId: followup?.focusPositionId,
         content: buffer,
         createdAt: Date.now(),
       }
@@ -99,7 +102,17 @@ export function useInterpret() {
     (question: string, focusLabel?: string) => void run('followup', { question, focusLabel }),
     [run],
   )
+  /** Deep-dive a single revealed card in its position, combined with the question. */
+  const interpretCard = useCallback(
+    (positionId: string, posLabel: string, cardName: string, reversed: boolean) =>
+      void run('followup', {
+        question: `请结合「${posLabel}」这个位置与我的问题，深入解读「${cardName}（${reversed ? '逆位' : '正位'}）」这张牌：它的核心象征、对应能量，以及对我的具体启示与行动建议。`,
+        focusLabel: posLabel,
+        focusPositionId: positionId,
+      }),
+    [run],
+  )
   const cancel = useCallback(() => abortRef.current?.abort(), [])
 
-  return { interpret, followUp, cancel }
+  return { interpret, followUp, interpretCard, cancel }
 }
