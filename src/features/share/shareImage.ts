@@ -98,6 +98,31 @@ async function makeQr(text: string): Promise<HTMLImageElement> {
   return loadImage(url)
 }
 
+/** A centered row of gold-outline value-prop pills. */
+function drawPills(ctx: CanvasRenderingContext2D, centerX: number, y: number, items: string[]) {
+  const padX = 22
+  const gap = 16
+  const h = 48
+  ctx.font = `500 27px ${FONT_SANS}`
+  const widths = items.map((t) => ctx.measureText(t).width + padX * 2)
+  const total = widths.reduce((a, b) => a + b, 0) + gap * (items.length - 1)
+  let x = centerX - total / 2
+  items.forEach((t, i) => {
+    const w = widths[i]
+    roundRect(ctx, x, y, w, h, h / 2)
+    ctx.fillStyle = 'rgba(220,171,68,0.12)'
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(236,198,106,0.65)'
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+    ctx.fillStyle = '#ecc66a'
+    ctx.textAlign = 'center'
+    ctx.font = `500 27px ${FONT_SANS}`
+    ctx.fillText(t, x + w / 2, y + h / 2 + 9)
+    x += w + gap
+  })
+}
+
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath()
   ctx.moveTo(x + r, y)
@@ -182,7 +207,7 @@ export async function composeShareImage({
     interpTop = cursorY
     cursorY += 64 + interpLines.length * lineH + 40 // heading + lines + gap
   }
-  const footerH = 230
+  const footerH = 320
   const H = Math.round(cursorY + footerH)
 
   const canvas = document.createElement('canvas')
@@ -295,33 +320,37 @@ export async function composeShareImage({
     interpLines.forEach((ln, i) => ctx.fillText(ln, PAD, interpTop + 100 + i * lineH))
   }
 
-  // ── footer: QR + caption ──
-  const footTop = H - footerH + 20
+  // ── footer: value props + QR + caption ──
+  const footTop = H - footerH + 16
+  // value-prop pills — the selling points, front and center
+  drawPills(ctx, W / 2, footTop, ['AI 智能解牌', '数据不出本机', '开源 · 隐私优先'])
+  const divY = footTop + 84
   ctx.strokeStyle = 'rgba(220,171,68,0.3)'
+  ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(PAD, footTop)
-  ctx.lineTo(W - PAD, footTop)
+  ctx.moveTo(PAD, divY)
+  ctx.lineTo(W - PAD, divY)
   ctx.stroke()
   const qrSize = 150
   const qrX = PAD
-  const qrY = footTop + 26
+  const qrY = divY + 22
   // parchment panel for scan contrast
   ctx.fillStyle = C.parchment
   roundRect(ctx, qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 14)
   ctx.fill()
   ctx.drawImage(qr, qrX, qrY, qrSize, qrSize)
-  // caption
+  // caption — lead with AI, then privacy, then source
   ctx.textAlign = 'left'
   const tx = qrX + qrSize + 36
   ctx.fillStyle = C.goldHi
   ctx.font = `600 34px ${FONT_SERIF}`
-  ctx.fillText('扫码体验', tx, footTop + 60)
+  ctx.fillText('扫码 · 让 AI 为你解读', tx, qrY + 34)
   ctx.fillStyle = C.ink2
-  ctx.font = `400 26px ${FONT_SANS}`
-  ctx.fillText('开源 · 纯前端 · 自带模型密钥', tx, footTop + 102)
+  ctx.font = `400 25px ${FONT_SANS}`
+  ctx.fillText('纯浏览器运行 · 不注册 · 不收集任何个人数据', tx, qrY + 78)
   ctx.fillStyle = C.ink3
-  ctx.font = `400 24px ${FONT_SANS}`
-  ctx.fillText('github.com/anois/tarot · 由 Claude Code 维护', tx, footTop + 140)
+  ctx.font = `400 23px ${FONT_SANS}`
+  ctx.fillText('开源 · github.com/anois/tarot', tx, qrY + 116)
 
   return canvas.toDataURL('image/png')
 }
