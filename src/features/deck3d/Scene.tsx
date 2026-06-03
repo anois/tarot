@@ -1,12 +1,50 @@
 import { Suspense, useRef, type ReactNode } from 'react'
 import * as THREE from 'three'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import { easing } from 'maath'
 import { useReducedMotion } from '@/lib/useReducedMotion'
+import { useDivination } from '@/features/divination/divination.store'
+import { spreadBounds } from './layout'
 import { Deck } from './Deck'
 import { Table } from './Table'
 import { SlotOutlines } from './SlotOutlines'
+
+const DEFAULT_CAM: [number, number, number] = [0, 0.2, 13.5]
+const DEFAULT_LOOK: [number, number, number] = [0, 0.2, 0]
+
+/**
+ * Eases the camera between the wide "table" view (idle → revealing) and a
+ * framed close-up centered on the spread once the reading is `done`: the board
+ * is fit to the viewport (respecting aspect) with a small margin, so it sits
+ * centered and fills the freed space instead of hanging in the upper area.
+ */
+function CameraRig() {
+  const phase = useDivination((s) => s.phase)
+  const spread = useDivination((s) => s.spread)
+  const { camera, size } = useThree()
+  const reduced = useReducedMotion()
+  const look = useRef(new THREE.Vector3(...DEFAULT_LOOK))
+  useFrame((_, dt) => {
+    let pos = DEFAULT_CAM
+    let target = DEFAULT_LOOK
+    if (phase === 'done' && spread) {
+      const aspect = size.width / Math.max(1, size.height)
+      const fov = (camera as THREE.PerspectiveCamera).fov ?? 45
+      const tanV = Math.tan(THREE.MathUtils.degToRad(fov) / 2)
+      const b = spreadBounds(spread)
+      const m = 1.14 // keep a small, even margin around the board
+      const dist = Math.max((b.hh * m) / tanV, (b.hw * m) / (aspect * tanV), 6)
+      pos = [b.cx, b.cy, dist]
+      target = [b.cx, b.cy, 0]
+    }
+    const smooth = reduced ? 0.06 : 0.5
+    easing.damp3(camera.position, pos, smooth, dt)
+    easing.damp3(look.current, target, smooth, dt)
+    camera.lookAt(look.current)
+  })
+  return null
+}
 
 // Parallax only makes sense with a hovering mouse — on touch the pointer jumps
 // to the last touch point, which feels jittery. Gate it to fine pointers.
@@ -47,6 +85,7 @@ export function Scene() {
       {/* night-950 ground (matches the 2D theme token) */}
       <color attach="background" args={['#0e0a13']} />
       <fog attach="fog" args={['#0e0a13', 16, 30]} />
+      <CameraRig />
 
       <ambientLight intensity={0.42} />
       <hemisphereLight args={['#efe2c4', '#1a1320', 0.5]} />

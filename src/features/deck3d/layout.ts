@@ -158,6 +158,35 @@ export function spreadCardScale(spread: Spread, plane: PlaneSpec): number {
   return (spread.card.widthRatio * plane.width) / CARD_W
 }
 
+/**
+ * World-space bounding box of the laid-out board (card rectangles, incl.
+ * rotation + BOARD_OFFSET_Y). Used to frame the camera onto the spread once the
+ * reading is revealed. Returns the box center and half-extents.
+ */
+export function spreadBounds(spread: Spread): { cx: number; cy: number; hw: number; hh: number } {
+  const plane = spreadPlane(spread)
+  const scale = spreadCardScale(spread, plane)
+  const cw = CARD_W * scale
+  const ch = CARD_H * scale
+  let minX = Infinity
+  let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
+  for (const p of spread.positions) {
+    const x = (p.x - 0.5) * plane.width
+    const y = (0.5 - p.y) * plane.height + BOARD_OFFSET_Y
+    const r = degToRad(p.rotation)
+    // half-extents of the rotated card's axis-aligned bounding box
+    const hw = 0.5 * (Math.abs(cw * Math.cos(r)) + Math.abs(ch * Math.sin(r)))
+    const hh = 0.5 * (Math.abs(cw * Math.sin(r)) + Math.abs(ch * Math.cos(r)))
+    minX = Math.min(minX, x - hw)
+    maxX = Math.max(maxX, x + hw)
+    minY = Math.min(minY, y - hh)
+    maxY = Math.max(maxY, y + hh)
+  }
+  return { cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, hw: (maxX - minX) / 2, hh: (maxY - minY) / 2 }
+}
+
 export function spreadTransform(
   pos: SpreadPosition,
   reversed: boolean,
