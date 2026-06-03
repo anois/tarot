@@ -5,7 +5,7 @@ This app is a static Vite build (`dist/`). Two targets ship from one workflow
 independent job so a failure on one doesn't block the other:
 
 1. **GitHub Pages** (worldwide entry) — <https://anois.github.io/tarot/>
-2. **Aliyun OSS** (China-domestic mirror) — served at the bucket root
+2. **Aliyun OSS** (China-domestic mirror) — served at the bucket root — <https://tarotj.oss-cn-beijing.aliyuncs.com/>
 
 > **Why two builds?** The targets need different Vite `base` paths. GitHub Pages
 > serves a project site under `/<repo>/`, so it builds with `BASE_PATH=/tarot/`.

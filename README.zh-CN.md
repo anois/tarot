@@ -13,6 +13,7 @@
 </p>
 
 <sub>
+<a href="https://tarotj.oss-cn-beijing.aliyuncs.com/">国内镜像</a> ·
 <a href="LICENSE">MIT</a> ·
 <a href="README.md">English</a> ·
 <a href="https://github.com/anois/tarot/issues/new">提个需求 →</a>
@@ -57,6 +58,17 @@
 
 <p align="center"><img src="docs/screenshots/03-mobile-card-detail.jpg" width="320" alt="卡牌详情面板，全中文" /></p>
 
+## 准备一把模型密钥（以 DeepSeek 为例）
+
+应用本身不含密钥，需要你自带。获取 DeepSeek 密钥：
+
+1. 在 **[DeepSeek 开放平台](https://platform.deepseek.com/)** 注册 / 登录（手机号或邮箱）。
+2. 进入 **API keys（API 密钥）→ 创建 API key**，复制保存 —— 只显示一次。
+3. 在 **充值 / Billing** 里预付一笔**小额**余额。余额就是你的花费上限（DeepSeek 没有按 key 的额度限制），个人占卜几元足够；新账户可能有赠送额度。
+4. 回到应用：**设置 → 服务商选 DeepSeek → 粘贴密钥 → 测试连接**。DeepSeek 已实测可浏览器直连。
+
+> **分享安全：** `#cfg=` 链接会内嵌你的密钥并消耗**你的**余额。DeepSeek 只能靠账户余额限额，分享前请保持**小额余额 + 专用可删 key**；若想按 key 设预算上限，改用支持 per-key credit limit 的 **OpenRouter** 密钥。
+
 ## 里面都有什么
 
 | 维度 | 内容 |
@@ -86,7 +98,7 @@ pnpm build        # tsc 类型检查 + 生产构建
 - **架构**（divination store 作为唯一真源、统一的 3D 牌组、共享的归一化牌阵坐标、BYOK 大模型客户端 + SSE 解析、提示词组装）→ [`CLAUDE.md`](CLAUDE.md)
 - **部署**（GitHub Pages 工作流 + 阿里云 OSS 国内镜像、base 路径处理、SPA 回退）→ [`docs/deploy.md`](docs/deploy.md)
 
-`pnpm build` 产出纯静态 `dist/`；推送 `main` 即自动部署到 **GitHub Pages**（以及可选的阿里云 OSS 国内镜像）。
+`pnpm build` 产出纯静态 `dist/`；推送 `main` 即自动部署到 **GitHub Pages**，以及阿里云 OSS 国内镜像 <https://tarotj.oss-cn-beijing.aliyuncs.com/>。
 
 ## 🤖 由 Claude Code 维护
 

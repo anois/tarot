@@ -13,6 +13,7 @@ Pure front-end · no backend · bring-your-own model key · Chinese-first.
 </p>
 
 <sub>
+<a href="https://tarotj.oss-cn-beijing.aliyuncs.com/">CN mirror</a> ·
 <a href="LICENSE">MIT</a> ·
 <a href="README.zh-CN.md">中文</a> ·
 <a href="https://github.com/anois/tarot/issues/new">Request a feature →</a>
@@ -57,6 +58,17 @@ Tap any revealed card for a detail sheet: element, Golden-Dawn astrology, numero
 
 <p align="center"><img src="docs/screenshots/03-mobile-card-detail.jpg" width="320" alt="Card detail sheet, fully Chinese" /></p>
 
+## Getting a model key (DeepSeek)
+
+The app ships no key — you bring your own. To get a DeepSeek key:
+
+1. Sign up / sign in at the **[DeepSeek open platform](https://platform.deepseek.com/)** (phone or email).
+2. Open **API keys → Create new API key** and copy it — it's shown only once.
+3. **Top up** a small prepaid balance under **Billing / 充值**. The balance *is* your spending cap (DeepSeek has no per-key limit), so a few yuan is plenty for personal readings; new accounts may get trial credit.
+4. In the app: **Settings → provider: DeepSeek → paste the key → 测试连接 (test connection)**. DeepSeek is verified to work browser-direct.
+
+> **Sharing safety:** a `#cfg=` link embeds your key and spends *your* balance. Since DeepSeek caps spend only by the account balance, share only with a small balance + a dedicated, deletable key — or use an **OpenRouter** key with a per-key credit limit instead.
+
 ## What's inside
 
 | Axis | What's there |
@@ -86,7 +98,7 @@ For local-dev convenience you can pre-fill the key box from `.env` (`VITE_DEV_LL
 - **Architecture** (the divination store as single source of truth, the unified 3D deck, the shared normalized spread coordinates, the BYOK LLM client + SSE parsers, prompt assembly) → [`CLAUDE.md`](CLAUDE.md)
 - **Deployment** (GitHub Pages workflow + Aliyun OSS China-mirror, base-path handling, SPA fallback) → [`docs/deploy.md`](docs/deploy.md)
 
-`pnpm build` emits a static `dist/`; pushing to `main` auto-deploys to **GitHub Pages** (and, opt-in, an Aliyun OSS China mirror).
+`pnpm build` emits a static `dist/`; pushing to `main` auto-deploys to **GitHub Pages** and an Aliyun OSS China mirror at <https://tarotj.oss-cn-beijing.aliyuncs.com/>.
 
 ## 🤖 Maintained by Claude Code
 
