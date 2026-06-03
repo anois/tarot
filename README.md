@@ -1,75 +1,111 @@
-# 塔罗 · 3D 在线占卜
+<div align="center">
 
-一个**纯前端、无后端**的塔罗占卜网页：用 react-three-fiber 实现 3D 洗牌 / 浏览 / **用户自行抽牌** / 落位 / 翻牌；内置公版 Rider‑Waite‑Smith 78 张牌；通过 **BYOK**（自带大模型密钥）在浏览器中直连大模型，把「问题 + 牌阵 + 抽到的牌（含正逆位）+ 牌义」打包成结构化上下文请求解读。界面与解读以中文为主。
+<img src="public/favicon.svg" width="80" alt="塔罗 · 3D 占卜 logo" />
 
-## 特性
+# 塔罗 · 3D 占卜
 
-- **3D 牌桌**：crypto 级 Fisher‑Yates 洗牌动画 → 78 张牌扇形展开 → 用户点选抽牌 → 牌飞向牌阵位置并翻面（逆位牌旋转 180°）。
-- **牌阵**：内置 6 种（单张 / 三张 / 关系 / 马蹄 / 凯尔特十字 / 年度之轮）+ JSON 导入导出 + **可视化拖拽编辑器**。
-- **大模型解读（BYOK）**：OpenAI 兼容客户端，默认 DeepSeek（浏览器可直连），OpenRouter 一键回退；支持 4 种模板（结构化 / 叙事 / 速答 / 深入追问），SSE 流式渲染 Markdown。
-- **本地历史**：每次带解读的占卜自动保存到 IndexedDB，可回看、导出 / 导入分享。
+**A 3D tarot table in your browser — shuffle, draw your own cards, and let your own LLM read the spread.**
 
-## 开发
+Pure front-end · no backend · bring-your-own model key · Chinese-first.
+
+<p>
+<a href="https://anois.github.io/tarot/"><img src="https://img.shields.io/badge/launch_app-anois.github.io%2Ftarot-d9a441?style=for-the-badge" alt="Launch app" /></a>
+</p>
+
+<sub>
+<a href="LICENSE">MIT</a> ·
+<a href="README.zh-CN.md">中文</a> ·
+<a href="https://github.com/anois/tarot/issues/new">Request a feature →</a>
+</sub>
+
+</div>
+
+---
+
+**塔罗 · 3D** is a tarot divination web app that runs entirely in your browser — no backend, no accounts, no telemetry. Shuffle a crypto-grade deck on a candlelit 3D table, then **draw your own cards** (they are never auto-dealt — you scrub the ribbon and tap the one you want), watch each fly into its place in the spread and flip face-up, with reversed cards turned 180°. Bring your own LLM key (**BYOK**) and the browser packs your question + the spread + the drawn cards (with orientations) + each card's meaning into a structured prompt and streams an interpretation back — entirely in Simplified Chinese. Your key talks straight to the provider you chose; nothing passes through a server we run.
+
+## Draw your own cards — a real 3D table
+
+The whole reading lives on one immersive screen. The deck is the hero: tap it (or **洗牌**) to shuffle, swipe the ribbon to browse face-down cards, and tap the centered one to draw it into the next slot. When the reading is revealed the camera eases in and frames the board. The card you picked is literally the mesh that flies up and flips — no sleight of hand.
+
+<table>
+  <tr>
+    <td width="50%" align="center"><img src="docs/screenshots/01-mobile-idle.jpg" width="290" alt="Idle deck + spread carousel + shuffle CTA" /></td>
+    <td width="50%" align="center"><img src="docs/screenshots/02-mobile-reading.jpg" width="290" alt="Revealed three-card reading, camera framed on the board" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Idle — deck hero, swipeable spread picker, candlelit CTA</sub></td>
+    <td align="center"><sub>Revealed — board centered & framed, drawn-card list</sub></td>
+  </tr>
+</table>
+
+## 14 spreads — from a single card to the zodiac wheel
+
+Built-in spreads cover single-card, two-card decision / yes-no, three-card timelines, mind-body-spirit, relationship, pentagram, horseshoe, chakra column, Celtic Cross, the 12-house zodiac wheel, and the year-ahead ring. Every spread is described in one normalized `[0,1]` coordinate system shared by the 2D preview, the 3D board, and the visual editor — so you can also **import / export spreads as JSON** or **drag out your own** in the editor, and they render identically everywhere.
+
+<p align="center"><img src="docs/screenshots/05-spreads.jpg" width="860" alt="Spreads library showing the built-in spreads" /></p>
+
+## Bring your own key — the browser talks straight to the model
+
+There is no server in the loop. You paste your **own** API key in Settings (kept in memory by default; opt-in to session/localStorage), and the browser calls the model directly. **DeepSeek** is the verified browser-direct default; **OpenRouter** is the wildcard-CORS fallback; Anthropic-native and any OpenAI-compatible endpoint are supported too. Pick from five reading styles — structured card-by-card, narrative, quick answer, whole-board synthesis, and a deep-dive follow-up that remembers the drawn cards — and the response streams in as Markdown. Readings auto-save to IndexedDB (history is yours, on-device, exportable), and you can mint a `#cfg=` share link so a friend without a key can try it.
+
+<p align="center"><img src="docs/screenshots/04-desktop-reading.jpg" width="860" alt="Celtic Cross reading on desktop, framed and centered" /></p>
+
+## Every card, fully in Chinese
+
+Tap any revealed card for a detail sheet: element, Golden-Dawn astrology, numerology, authored symbolism & story, curated keywords, and orientation-appropriate meanings — all in Simplified Chinese. A position-aware button asks the model what this card means *in this position, for this question*; the whole-board template reads the spread's overall shape (element balance, upright/reversed ratio, Major-Arcana density, dominant/absent element).
+
+<p align="center"><img src="docs/screenshots/03-mobile-card-detail.jpg" width="320" alt="Card detail sheet, fully Chinese" /></p>
+
+## What's inside
+
+| Axis | What's there |
+|---|---|
+| **3D table** | One unified deck of meshes: crypto-grade Fisher–Yates shuffle → coverflow browse → **you draw** → fly into slot → flip in place (reversed = 180°). Candlelit "grimoire" theme, drop shadows, sparkles, camera framing on reveal, reduced-motion + mobile perf tiers. |
+| **Drawing** | You pick your own cards (never dealt); LIFO undo before confirm; per-card independent reversed coin decided after the shuffle. Major-Arcana-only mode. |
+| **Spreads** | 14 built-ins + JSON import/export + a visual drag editor; one normalized `[0,1]` convention shared by 2D preview / 3D board / editor; Zod-validated with cross-field invariants. |
+| **LLM (BYOK)** | OpenAI-compatible client, DeepSeek (browser-direct) default + OpenRouter fallback + Anthropic + custom; SSE streaming; 5 templates incl. whole-board synthesis & deep-dive; CORS errors classified with a "switch to OpenRouter" hint. |
+| **Reference** | 78-card RWS deck + authored Chinese element / astrology / numerology / symbolism / story + curated Chinese keywords & upright/reversed meanings. |
+| **Local** | IndexedDB history (auto-saved, export/import), persisted appearance prefs, `#cfg=` config share-link (key lives only in the URL fragment, never sent to a server). |
+| **Surface** | Mobile-first: bottom tab bar, immersive single-flow, bottom-sheet controls, ≥44px touch targets, `svh` + safe-area; desktop gets the top nav and a wider table. |
+
+## Run it locally
 
 ```bash
+git clone https://github.com/anois/tarot.git
+cd tarot
 pnpm install
-pnpm dev        # 启动开发服务器
-pnpm test       # 运行单元测试（vitest）
-pnpm lint       # ESLint
-pnpm build      # 类型检查 + 生产构建
-pnpm preview    # 预览构建产物
+pnpm dev          # → http://localhost:5173 (or 5174)
+pnpm test         # vitest (unit tests)
+pnpm lint         # eslint
+pnpm build        # tsc typecheck + production build
 ```
 
-### 大模型密钥（BYOK）
+For local-dev convenience you can pre-fill the key box from `.env` (`VITE_DEV_LLM_*`, see `.env.example`) — this is read **only** under `pnpm dev` and is dead-code-eliminated from production builds, so no key ever ships in the bundle.
 
-- 生产环境严格 BYOK：用户在「设置」中填入**自己的**密钥，仅保存在浏览器（默认仅内存；可选 session / localStorage），直接发往所选服务商，**绝不经过任何后端**。
-- 本地开发便利：在 `.env` 中设置 `VITE_DEV_LLM_API_KEY` / `VITE_DEV_LLM_BASE_URL` / `VITE_DEV_LLM_MODEL`（见 `.env.example`），仅在 `pnpm dev` 时预填密钥框；该值**不会**被打进生产 bundle（受 `import.meta.env.DEV` 死代码消除保护）。
-- 服务商：DeepSeek（推荐，实测浏览器可直连）、OpenRouter（通配 CORS，回退/多模型）、Anthropic（需特殊浏览器直连头）、自定义（OpenAI 兼容）。OpenAI 直连被浏览器拦截，请走 OpenRouter 或代理。
+- **Architecture** (the divination store as single source of truth, the unified 3D deck, the shared normalized spread coordinates, the BYOK LLM client + SSE parsers, prompt assembly) → [`CLAUDE.md`](CLAUDE.md)
+- **Deployment** (GitHub Pages workflow + Aliyun OSS China-mirror, base-path handling, SPA fallback) → [`docs/deploy.md`](docs/deploy.md)
 
-## 牌面素材与版权
+`pnpm build` emits a static `dist/`; pushing to `main` auto-deploys to **GitHub Pages** (and, opt-in, an Aliyun OSS China mirror).
 
-- `public/deck/` 为 Rider‑Waite‑Smith 78 张牌面（美国公有领域）。当前取自 `metabismuth/tarot-json`。
-- ⚠ 公开部署前请核实素材为 **1909 原版**（而非仍受版权的 1971 U.S. Games 重上色版），或替换为确认 1909 / CC0 的素材；`imageKey↔文件名` 映射稳定，可直接替换。详见 `public/deck/LICENSE.txt`。
-- 牌义数据：`dariusk/corpora`（CC0）。
-- 「Rider‑Waite」为 U.S. Games 商标，请勿以该商标命名 / 宣传。
+## 🤖 Maintained by Claude Code
 
-## 部署
+**Every commit in this repository is produced by a [Claude Code](https://claude.com/claude-code) session.** The 3D engine, shuffle math, spread definitions, LLM client, UI, CSS, i18n strings, this README — there is no human-authored line of code in the visible history, and there isn't supposed to be. This is the project's actual operating model, not a marketing flourish.
 
-`pnpm build` 产出纯静态 `dist/`，可部署到任意静态托管。本仓库通过 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) 双目标自动部署（推 `main` 即发布）：
+- **Human-authored PRs are not part of the workflow — please don't open one; it won't be merged.** The single committer identity for this repo is the Claude Code maintenance pipeline.
+- **The input channel is [GitHub Issues](https://github.com/anois/tarot/issues/new).** Plain prose is fine — Chinese or English, a few lines describing what you'd like or what's broken. Reasonable issues get picked up, handed to a Claude Code session that implements + tests + opens the PR, and (after the maintainer's local acceptance) merges + auto-deploys.
+- **Auditable:** the commit history is the audit trail, and each PR description documents why a change shipped.
 
-- **GitHub Pages**（全球入口，`base=/tarot/`）：<https://anois.github.io/tarot/>
-- **阿里云 OSS**（国内镜像，`base=/` 桶根）：可选，配置好 `ALIYUN_*` 密钥并设 `ENABLE_OSS_DEPLOY=true` 后启用。
+## License
 
-详细的国内 OSS 部署步骤（建桶、RAM 子用户、密钥、ICP/安全页注意事项）见 [docs/deploy.md](docs/deploy.md)。
+- **App source:** [MIT](LICENSE).
+- **Card art:** the Rider–Waite–Smith deck under `public/deck/` is in the US public domain. ⚠ Before any public deployment, verify the scans are the **1909 edition** (not the still-copyrighted 1971 U.S. Games recolor) or swap to a confirmed CC0 set — the `imageKey ↔ filename` mapping is stable, so the art is a drop-in replacement. See [`public/deck/LICENSE.txt`](public/deck/LICENSE.txt).
+- **Card meanings dataset:** [`dariusk/corpora`](https://github.com/dariusk/corpora) (CC0).
+- **Display font:** Cinzel — [SIL Open Font License 1.1](https://fonts.google.com/specimen/Cinzel).
+- "Rider-Waite" is a U.S. Games trademark; this project is **not** branded as that mark.
 
-`public/_headers` 的 CSP 仅 Netlify / Cloudflare Pages 生效；GitHub Pages 与 OSS 不读取该文件，故其上 `connect-src` 不强制（BYOK 应用仅会调用用户自选的服务商，功能不受影响）。
+---
 
-## 技术栈
-
-Vite 7 + React 19 + TypeScript · react-three-fiber / drei / @react-spring/three · zustand · zod · dexie（IndexedDB）· i18next · tailwindcss v4 · react-markdown + remark-gfm。测试用 Vitest（67 个单测，纯逻辑跑 node 环境，React 组件按文件 opt-in jsdom）。
-
-## 项目结构
-
-```
-src/
-  deck/        78 张牌的数据、牌义、图片映射
-  mechanics/   crypto 级洗牌 / 抽牌 / 正逆位 RNG
-  spreads/     牌阵：内置 + 校验 + 导入导出 + 仓储
-  features/
-    deck3d/      3D 牌桌（洗牌→coverflow 浏览→抽牌→落位→翻面）
-    divination/  占卜状态机与解读面板
-    settings/    BYOK 大模型配置表单
-    spreads/     可视化拖拽牌阵编辑器
-  llm/         OpenAI 兼容客户端 + SSE 解析 + 密钥存储 + 分享链接
-  prompt/      4 种解读模板与上下文组装
-  reading/     一次占卜的记录、历史仓储、导入导出
-  routes/      页面路由（占卜 / 牌阵 / 编辑器 / 历史 / 设置）
-public/deck/   牌面图片素材（见 LICENSE.txt）
-```
-
-## 许可
-
-- 应用源码：**MIT**（见 `LICENSE`）。
-- 牌面图片：Rider‑Waite‑Smith，美国公有领域；公开部署前请核实 1909 原版，详见 `public/deck/LICENSE.txt`。
-- 牌义数据：`dariusk/corpora`（CC0）。
-- 「Rider‑Waite」为 U.S. Games 商标，请勿以此命名 / 宣传。
+<div align="center">
+<sub><a href="https://github.com/anois/tarot">github.com/anois/tarot</a> · every line shipped by <a href="https://claude.com/claude-code">Claude Code</a></sub>
+</div>
