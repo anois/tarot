@@ -1,4 +1,5 @@
 import type { Spread, SpreadPosition } from './types'
+import type { SpreadCategory } from './categories'
 
 const SPEC = 'tarot-spread/1.0' as const
 const round = (n: number) => Math.round(n * 1000) / 1000
@@ -334,19 +335,200 @@ const yearAhead: Spread = {
   positions: buildYearAhead(),
 }
 
-export const BUILTIN_SPREADS: readonly Spread[] = [
+// ── themed spreads ─────────────────────────────────────────────────────────
+const career: Spread = {
+  spec: SPEC,
+  id: 'career',
+  name: '事业指引（三张）',
+  description: '看清事业现状、可把握的机遇与当下行动。',
+  cardCount: 3,
+  aspectRatio: 1.8,
+  card: { widthRatio: 0.22, heightRatio: 0.42 },
+  positions: [
+    pos('now', 1, '现状', 0.2, 0.5, '你当前事业处境的核心状态与能量。', {
+      prompt: '请说明 {card} 揭示的当前事业处境与关键症结。',
+    }),
+    pos('chance', 2, '机遇', 0.5, 0.5, '当前可把握的机会与有利因素。', {
+      prompt: '请解读 {card} 指向的事业机遇与值得把握之处。',
+    }),
+    pos('action', 3, '行动', 0.8, 0.5, '此刻最值得采取的行动与方向。', {
+      prompt: '请基于 {card} 给出可落地的事业行动建议。',
+    }),
+  ],
+}
+
+const careerCross: Spread = {
+  spec: SPEC,
+  id: 'career-cross',
+  name: '事业全景（五张）',
+  description: '从现状、优势、障碍、机会到结果，全面审视事业局面。',
+  cardCount: 5,
+  aspectRatio: 1.3,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('now', 1, '现状', 0.5, 0.5, '事业当前的核心处境。', {
+      prompt: '请解读 {card} 揭示的事业现状与核心课题。',
+    }),
+    pos('strength', 2, '优势', 0.22, 0.5, '你在此事中的优势与资源。', {
+      prompt: '请说明 {card} 指向的优势与可依靠的资源。',
+    }),
+    pos('obstacle', 3, '障碍', 0.78, 0.5, '阻碍进展的因素或课题。', {
+      prompt: '请分析 {card} 反映的障碍与需要克服之处。',
+    }),
+    pos('opportunity', 4, '机会', 0.5, 0.2, '正在浮现的机会与有利条件。', {
+      prompt: '请解读 {card} 指向的机会与有利时机。',
+    }),
+    pos('outcome', 5, '结果', 0.5, 0.8, '若延续当前方向的可能结果。', {
+      prompt: '请描绘 {card} 指向的可能结果与走向。',
+    }),
+  ],
+}
+
+const wealth: Spread = {
+  spec: SPEC,
+  id: 'wealth',
+  name: '财运指引（三张）',
+  description: '看清当前财务、漏财阻碍与增益方向。',
+  cardCount: 3,
+  aspectRatio: 1.8,
+  card: { widthRatio: 0.22, heightRatio: 0.42 },
+  positions: [
+    pos('now', 1, '现状', 0.2, 0.5, '你当前的财务状况与金钱能量。', {
+      prompt: '请说明 {card} 揭示的当前财务状况。',
+    }),
+    pos('block', 2, '阻碍', 0.5, 0.5, '影响财运的阻碍或漏财之处。', {
+      prompt: '请分析 {card} 指向的财运阻碍或漏财模式。',
+    }),
+    pos('boost', 3, '增益', 0.8, 0.5, '改善财运、开源的方向与建议。', {
+      prompt: '请基于 {card} 给出改善财运、开源的建议。',
+    }),
+  ],
+}
+
+const wealthFlow: Spread = {
+  spec: SPEC,
+  id: 'wealth-flow',
+  name: '财运全景（五张）',
+  description: '从现状、收入、支出、机会到走向，审视整体财务流动。',
+  cardCount: 5,
+  aspectRatio: 1.3,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('now', 1, '现状', 0.5, 0.5, '当前整体财务状况。', {
+      prompt: '请解读 {card} 揭示的整体财务现状。',
+    }),
+    pos('income', 2, '收入', 0.22, 0.5, '收入与进财的来源或潜力。', {
+      prompt: '请说明 {card} 指向的收入来源与进财潜力。',
+    }),
+    pos('expense', 3, '支出', 0.78, 0.5, '支出与漏财的模式。', {
+      prompt: '请分析 {card} 反映的支出习惯或漏财之处。',
+    }),
+    pos('opportunity', 4, '机会', 0.5, 0.2, '潜在的增财机会。', {
+      prompt: '请解读 {card} 指向的增财机会。',
+    }),
+    pos('trend', 5, '走向', 0.5, 0.8, '财运的可能走向。', {
+      prompt: '请描绘 {card} 指向的财运走向。',
+    }),
+  ],
+}
+
+const crush: Spread = {
+  spec: SPEC,
+  id: 'crush',
+  name: '桃花运（三张）',
+  description: '看清你的感情状态、近期桃花机缘与把握方式。',
+  cardCount: 3,
+  aspectRatio: 1.8,
+  card: { widthRatio: 0.22, heightRatio: 0.42 },
+  positions: [
+    pos('you', 1, '你的状态', 0.2, 0.5, '你当前在感情上的状态与气场。', {
+      prompt: '请说明 {card} 揭示的你当下的感情状态与气场。',
+    }),
+    pos('fate', 2, '桃花机缘', 0.5, 0.5, '近期桃花、缘分的形态与来处。', {
+      prompt: '请解读 {card} 指向的近期桃花机缘的形态。',
+    }),
+    pos('grasp', 3, '把握方式', 0.8, 0.5, '如何更好地迎接与把握这段缘分。', {
+      prompt: '请基于 {card} 给出迎接与把握桃花的建议。',
+    }),
+  ],
+}
+
+const admirer: Spread = {
+  spec: SPEC,
+  id: 'admirer',
+  name: '对方的心（五张）',
+  description: '从对方视角看 TA 眼中的你、感受、顾虑、期待与可能的行动。',
+  cardCount: 5,
+  aspectRatio: 1.3,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('view', 1, '眼中的你', 0.5, 0.5, '对方如何看待你。', {
+      prompt: '请解读 {card} 揭示的对方眼中的你。',
+    }),
+    pos('feeling', 2, '感受', 0.22, 0.5, '对方此刻的真实感受。', {
+      prompt: '请说明 {card} 反映的对方此刻的真实感受。',
+    }),
+    pos('worry', 3, '顾虑', 0.78, 0.5, '对方的顾虑或保留。', {
+      prompt: '请分析 {card} 指向的对方的顾虑或保留。',
+    }),
+    pos('hope', 4, '期待', 0.5, 0.2, '对方对这段关系的期待。', {
+      prompt: '请解读 {card} 揭示的对方对关系的期待。',
+    }),
+    pos('move', 5, '可能行动', 0.5, 0.8, '对方接下来可能的行动。', {
+      prompt: '请描绘 {card} 指向的对方可能的下一步行动。',
+    }),
+  ],
+}
+
+// theme category per built-in id; merged onto the exported spreads.
+const CATEGORY: Record<string, SpreadCategory> = {
+  single: 'general',
+  'three-card': 'general',
+  'situation-action-outcome': 'general',
+  horseshoe: 'general',
+  'celtic-cross': 'general',
+  'zodiac-houses': 'general',
+  'year-ahead': 'general',
+  relationship: 'love',
+  'relationship-cross': 'love',
+  crush: 'love',
+  admirer: 'love',
+  career: 'career',
+  'career-cross': 'career',
+  wealth: 'wealth',
+  'wealth-flow': 'wealth',
+  decision: 'decision',
+  'yes-no-clarifier': 'decision',
+  'mind-body-spirit': 'spiritual',
+  pentagram: 'spiritual',
+  chakra: 'spiritual',
+}
+
+// Grouped by category for a pleasant default order.
+const ALL: readonly Spread[] = [
   single,
-  decision,
-  yesNoClarifier,
   threeCard,
   situationActionOutcome,
-  mindBodySpirit,
-  relationship,
-  pentagram,
   horseshoe,
-  chakra,
-  relationshipCross,
   celticCross,
   zodiacHouses,
   yearAhead,
+  relationship,
+  relationshipCross,
+  crush,
+  admirer,
+  career,
+  careerCross,
+  wealth,
+  wealthFlow,
+  decision,
+  yesNoClarifier,
+  mindBodySpirit,
+  pentagram,
+  chakra,
 ]
+
+export const BUILTIN_SPREADS: readonly Spread[] = ALL.map((s) => ({
+  ...s,
+  category: CATEGORY[s.id],
+}))

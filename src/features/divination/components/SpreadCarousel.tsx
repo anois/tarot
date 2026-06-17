@@ -1,16 +1,20 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLiveQuery } from 'dexie-react-hooks'
 import clsx from 'clsx'
 import { SpreadPreview } from '@/spreads/SpreadPreview'
 import { BUILTIN_SPREADS } from '@/spreads/registry'
+import { SPREAD_CATEGORIES, type SpreadCategory } from '@/spreads/categories'
 import { listStoredSpreads } from '@/spreads/repo'
 import { useDivination } from '../divination.store'
 import type { Spread } from '@/spreads/types'
 
+type Filter = SpreadCategory | 'all' | 'custom'
+
 /**
- * In-flow spread picker: a horizontal, snap-scrolling rail of preview tiles.
- * Tapping a tile is the single selection seam — it calls setSpread() directly
- * (which resets the flow). Shown only in the idle phase.
+ * In-flow spread picker: theme-category chips over a horizontal, snap-scrolling
+ * rail of preview tiles. Tapping a tile is the single selection seam — it calls
+ * setSpread() directly (which resets the flow). Shown only in the idle phase.
  */
 export function SpreadCarousel() {
   const { t } = useTranslation()
@@ -18,17 +22,45 @@ export function SpreadCarousel() {
   const majorOnly = useDivination((s) => s.majorOnly)
   const setSpread = useDivination((s) => s.setSpread)
   const stored = useLiveQuery(() => listStoredSpreads(), [], [])
+  const [filter, setFilter] = useState<Filter>('all')
 
-  const items: { key: string; spread: Spread }[] = [
-    ...BUILTIN_SPREADS.map((s) => ({ key: `b:${s.id}`, spread: s })),
-    ...(stored ?? []).map((ss) => ({ key: `s:${ss.uuid}`, spread: ss.spread })),
+  const hasCustom = (stored?.length ?? 0) > 0
+  const cats = SPREAD_CATEGORIES.filter((c) => BUILTIN_SPREADS.some((s) => s.category === c.id))
+  const chips: { id: Filter; label: string; glyph?: string }[] = [
+    { id: 'all', label: '全部' },
+    ...cats.map((c) => ({ id: c.id as Filter, label: c.label, glyph: c.glyph })),
+    ...(hasCustom ? [{ id: 'custom' as Filter, label: '自定义' }] : []),
   ]
+
+  const items: { key: string; spread: Spread }[] = []
+  if (filter !== 'custom') {
+    for (const s of BUILTIN_SPREADS) {
+      if (filter === 'all' || s.category === filter) items.push({ key: `b:${s.id}`, spread: s })
+    }
+  }
+  if (filter === 'all' || filter === 'custom') {
+    for (const ss of stored ?? []) items.push({ key: `s:${ss.uuid}`, spread: ss.spread })
+  }
 
   return (
     <div className="animate-rise">
-      <div className="mb-2 flex items-baseline justify-between px-1">
-        <span className="text-sm text-ink-300">{t('reading.pickSpread')}</span>
-        <span className="text-xs text-ink-500">{t('reading.carouselHint')}</span>
+      {/* theme-category chips double as the section header */}
+      <div className="no-scrollbar mb-2 flex gap-1.5 overflow-x-auto pb-0.5">
+        {chips.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => setFilter(c.id)}
+            className={clsx(
+              'shrink-0 touch-manipulation rounded-full border px-3 py-1 text-xs transition-colors',
+              filter === c.id
+                ? 'border-gold-400 bg-gold-500/15 text-gold-200'
+                : 'border-night-600/50 text-ink-400 hover:text-ink-200',
+            )}
+          >
+            {c.glyph ? `${c.glyph} ${c.label}` : c.label}
+          </button>
+        ))}
       </div>
       <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1">
         {items.map(({ key, spread }) => {

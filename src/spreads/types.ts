@@ -1,3 +1,5 @@
+import type { SpreadCategory } from './categories'
+
 /** A tarot spread definition (tarot-spread/1.x). Coordinates are normalized
  *  to [0,1] and denote each card's CENTER; rotation is degrees clockwise. */
 export interface SpreadPosition {
@@ -31,6 +33,8 @@ export interface Spread {
   id: string
   name: string
   description?: string
+  /** Theme bucket for browsing (love / career / wealth / …). */
+  category?: SpreadCategory
   /** MUST equal positions.length. */
   cardCount: number
   /** Optional layout box aspect ratio hint (width / height). */

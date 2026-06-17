@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { BUILTIN_SPREADS, getBuiltinSpread } from './registry'
+import { SPREAD_CATEGORIES } from './categories'
 import { validateSpread } from './validate'
 import { parseSpreadJson, spreadToJson } from './io'
 import { isAllowedImageMime, isSafeImageDataUrl } from '@/lib/image-sanitize'
@@ -14,8 +15,12 @@ describe('built-in spreads', () => {
     const ids = BUILTIN_SPREADS.map((s) => s.id).sort()
     expect(ids).toEqual(
       [
+        'admirer',
+        'career',
+        'career-cross',
         'celtic-cross',
         'chakra',
+        'crush',
         'decision',
         'horseshoe',
         'mind-body-spirit',
@@ -25,11 +30,20 @@ describe('built-in spreads', () => {
         'single',
         'situation-action-outcome',
         'three-card',
+        'wealth',
+        'wealth-flow',
         'year-ahead',
         'yes-no-clarifier',
         'zodiac-houses',
       ].sort(),
     )
+  })
+
+  it('every built-in has a known theme category', () => {
+    const known = new Set(SPREAD_CATEGORIES.map((c) => c.id))
+    for (const s of BUILTIN_SPREADS) {
+      expect(known.has(s.category as never), `${s.id} category=${s.category}`).toBe(true)
+    }
   })
 
   it('all built-ins are valid and cardCount matches positions', () => {

@@ -6,6 +6,7 @@ import { PageHeading } from '@/ui/Panel'
 import { Button } from '@/ui/Button'
 import { SpreadPreview } from '@/spreads/SpreadPreview'
 import { BUILTIN_SPREADS } from '@/spreads/registry'
+import { SPREAD_CATEGORIES } from '@/spreads/categories'
 import { downloadSpread, importSpreadFromFile } from '@/spreads/io'
 import { listStoredSpreads, saveSpread, deleteStoredSpread } from '@/spreads/repo'
 import { useDivination } from '@/features/divination/divination.store'
@@ -63,18 +64,29 @@ export default function SpreadsRoute() {
         {importError && <span className="text-sm text-reversed">{importError}</span>}
       </div>
 
-      <h2 className="mb-3 font-display text-xl text-gold-300">{t('spreadsPage.builtin')}</h2>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {BUILTIN_SPREADS.map((s) => (
-          <SpreadTile
-            key={s.id}
-            spread={s}
-            onUse={() => chooseSpread(s)}
-            onDuplicate={() => duplicateToEditor(s, s.id)}
-            onExport={() => downloadSpread(s)}
-          />
-        ))}
-      </div>
+      {SPREAD_CATEGORIES.map((c) => {
+        const list = BUILTIN_SPREADS.filter((s) => s.category === c.id)
+        if (!list.length) return null
+        return (
+          <section key={c.id} className="mb-8">
+            <h2 className="mb-3 font-display text-xl text-gold-300">
+              <span className="mr-1.5 text-gold-400">{c.glyph}</span>
+              {c.label}
+            </h2>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {list.map((s) => (
+                <SpreadTile
+                  key={s.id}
+                  spread={s}
+                  onUse={() => chooseSpread(s)}
+                  onDuplicate={() => duplicateToEditor(s, s.id)}
+                  onExport={() => downloadSpread(s)}
+                />
+              ))}
+            </div>
+          </section>
+        )
+      })}
 
       <h2 className="mb-3 mt-8 font-display text-xl text-gold-300">{t('spreadsPage.custom')}</h2>
       {stored && stored.length > 0 ? (

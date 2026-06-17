@@ -29,6 +29,7 @@ export const spreadSchema = z
     id: z.string().min(1),
     name: z.string().min(1),
     description: z.string().optional(),
+    category: z.string().optional(),
     cardCount: z.number().int().positive(),
     aspectRatio: z.number().positive().optional(),
     defaultReversedProbability: z.number().min(0).max(1).optional(),
