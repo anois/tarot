@@ -480,6 +480,121 @@ const admirer: Spread = {
   ],
 }
 
+// ── 桃花 / 感情 spreads (popular 小红书-style love spread types) ──────────────
+const trueLove: Spread = {
+  spec: SPEC,
+  id: 'true-love',
+  name: '正缘牌阵（六张）',
+  description: '看清你的状态、正缘何时出现、TA 的特质、如何相遇、发展与建议。',
+  cardCount: 6,
+  aspectRatio: 1.4,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('you', 1, '你的状态', 0.2, 0.27, '你当前的感情状态与吸引正缘的能量。', {
+      prompt: '请说明 {card} 揭示的你当下的感情状态与桃花能量。',
+    }),
+    pos('when', 2, '正缘何时', 0.5, 0.27, '正缘可能出现的时机与征兆。', {
+      prompt: '请解读 {card} 指向的正缘出现的时机或征兆。',
+    }),
+    pos('trait', 3, 'TA 的特质', 0.8, 0.27, '正缘对象的性格或外在特质。', {
+      prompt: '请描绘 {card} 暗示的正缘对象的特质或类型。',
+    }),
+    pos('meet', 4, '如何相遇', 0.2, 0.73, '你们可能相遇的方式或场景。', {
+      prompt: '请说明 {card} 指向你们相遇的方式或契机。',
+    }),
+    pos('develop', 5, '关系发展', 0.5, 0.73, '这段缘分可能的发展走向。', {
+      prompt: '请解读 {card} 指向这段关系的发展走向。',
+    }),
+    pos('advice', 6, '建议', 0.8, 0.73, '迎接正缘你需要做的调整。', {
+      prompt: '请基于 {card} 给出迎接正缘的建议。',
+    }),
+  ],
+}
+
+const singleNoMore: Spread = {
+  spec: SPEC,
+  id: 'single-no-more',
+  name: '脱单牌阵（五张）',
+  description: '看清单身现状、阻碍、桃花来处、如何脱单与结果。',
+  cardCount: 5,
+  aspectRatio: 1.3,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('now', 1, '单身现状', 0.5, 0.5, '你目前单身状态的核心原因。', {
+      prompt: '请解读 {card} 揭示你当前单身状态的核心原因。',
+    }),
+    pos('block', 2, '阻碍', 0.22, 0.5, '阻碍你脱单的内在或外在因素。', {
+      prompt: '请分析 {card} 指向阻碍你脱单的因素。',
+    }),
+    pos('source', 3, '桃花来处', 0.78, 0.5, '桃花可能出现的方向或来源。', {
+      prompt: '请说明 {card} 暗示桃花可能出现的方向或场景。',
+    }),
+    pos('how', 4, '如何脱单', 0.5, 0.2, '助你脱单的行动或心态调整。', {
+      prompt: '请基于 {card} 给出助你脱单的行动建议。',
+    }),
+    pos('result', 5, '结果', 0.5, 0.8, '一段时间内脱单的可能结果。', {
+      prompt: '请描绘 {card} 指向的脱单结果与走向。',
+    }),
+  ],
+}
+
+const reunite: Spread = {
+  spec: SPEC,
+  id: 'reunite',
+  name: '复合牌阵（六张）',
+  description: '看清双方心境、TA 是否还在意、复合的阻碍、可能与建议。',
+  cardCount: 6,
+  aspectRatio: 1.4,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('you', 1, '你现在', 0.2, 0.27, '你此刻对这段关系的真实心境。', {
+      prompt: '请说明 {card} 揭示你此刻对这段关系的心境。',
+    }),
+    pos('them', 2, 'TA 现在', 0.5, 0.27, '对方此刻的状态与心境。', {
+      prompt: '请解读 {card} 反映对方此刻的状态与心境。',
+    }),
+    pos('care', 3, 'TA 还在意吗', 0.8, 0.27, '对方是否仍在意你、念旧情。', {
+      prompt: '请解读 {card} 指向对方是否仍在意你。',
+    }),
+    pos('block', 4, '复合阻碍', 0.2, 0.73, '阻碍你们复合的关键问题。', {
+      prompt: '请分析 {card} 指向复合的关键阻碍。',
+    }),
+    pos('odds', 5, '复合可能', 0.5, 0.73, '这段关系复合的可能性。', {
+      prompt: '请解读 {card} 指向复合的可能性高低与条件。',
+    }),
+    pos('advice', 6, '建议', 0.8, 0.73, '面对这段关系你该如何抉择。', {
+      prompt: '请基于 {card} 给出面对这段关系的建议。',
+    }),
+  ],
+}
+
+const situationship: Spread = {
+  spec: SPEC,
+  id: 'situationship',
+  name: '暧昧牌阵（五张）',
+  description: '看清暧昧的本质、双方心意、阻碍与能否升温的走向。',
+  cardCount: 5,
+  aspectRatio: 1.3,
+  card: { widthRatio: 0.16, heightRatio: 0.3 },
+  positions: [
+    pos('nature', 1, '暧昧本质', 0.5, 0.5, '这段暧昧关系的真实本质。', {
+      prompt: '请解读 {card} 揭示这段暧昧的本质。',
+    }),
+    pos('you', 2, '你的心意', 0.22, 0.5, '你对 TA 的真实心意。', {
+      prompt: '请说明 {card} 反映你对对方的真实心意。',
+    }),
+    pos('them', 3, 'TA 的心意', 0.78, 0.5, '对方对你的真实心意。', {
+      prompt: '请解读 {card} 指向对方对你的真实心意。',
+    }),
+    pos('block', 4, '阻碍', 0.5, 0.2, '让关系停在暧昧的阻碍。', {
+      prompt: '请分析 {card} 指向让关系停滞的阻碍。',
+    }),
+    pos('trend', 5, '走向', 0.5, 0.8, '这段暧昧能否升温及走向。', {
+      prompt: '请描绘 {card} 指向这段暧昧的走向。',
+    }),
+  ],
+}
+
 // theme category per built-in id; merged onto the exported spreads.
 const CATEGORY: Record<string, SpreadCategory> = {
   single: 'general',
@@ -493,6 +608,10 @@ const CATEGORY: Record<string, SpreadCategory> = {
   'relationship-cross': 'love',
   crush: 'love',
   admirer: 'love',
+  'true-love': 'love',
+  'single-no-more': 'love',
+  reunite: 'love',
+  situationship: 'love',
   career: 'career',
   'career-cross': 'career',
   wealth: 'wealth',
@@ -517,6 +636,10 @@ const ALL: readonly Spread[] = [
   relationshipCross,
   crush,
   admirer,
+  trueLove,
+  singleNoMore,
+  reunite,
+  situationship,
   career,
   careerCross,
   wealth,
