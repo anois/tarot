@@ -595,6 +595,33 @@ const situationship: Spread = {
   ],
 }
 
+const trend: Spread = {
+  spec: SPEC,
+  id: 'trend',
+  name: '发展趋势（五张）',
+  description: '以自己为中心，结合过去、现在、将遇见的与潜在变数，看清感情等议题的发展趋势。',
+  cardCount: 5,
+  aspectRatio: 0.85,
+  card: { widthRatio: 0.18, heightRatio: 0.26 },
+  positions: [
+    pos('self', 1, '自己', 0.5, 0.5, '你自身的状态与立场，是此事的中心。', {
+      prompt: '请说明 {card} 揭示的你自身在此事中的状态与立场。',
+    }),
+    pos('past', 2, '过去经验', 0.22, 0.2, '影响当前的过往经历与经验。', {
+      prompt: '请解读 {card} 反映的过往经验对当前的影响。',
+    }),
+    pos('present', 3, '现在情况', 0.5, 0.2, '当前的核心处境与能量。', {
+      prompt: '请解读 {card} 揭示的当前处境与核心能量。',
+    }),
+    pos('future', 4, '将会遇见', 0.78, 0.2, '接下来将遇见的人、事或转机。', {
+      prompt: '请解读 {card} 指向你接下来将遇见的人事或转机。',
+    }),
+    pos('hidden', 5, '潜在因素', 0.5, 0.8, '尚未显现、可能左右走向的潜在变数。', {
+      prompt: '请揭示 {card} 指向的潜在、不确定的变数。',
+    }),
+  ],
+}
+
 // theme category per built-in id; merged onto the exported spreads.
 const CATEGORY: Record<string, SpreadCategory> = {
   single: 'general',
@@ -612,6 +639,7 @@ const CATEGORY: Record<string, SpreadCategory> = {
   'single-no-more': 'love',
   reunite: 'love',
   situationship: 'love',
+  trend: 'love',
   career: 'career',
   'career-cross': 'career',
   wealth: 'wealth',
@@ -640,6 +668,7 @@ const ALL: readonly Spread[] = [
   singleNoMore,
   reunite,
   situationship,
+  trend,
   career,
   careerCross,
   wealth,

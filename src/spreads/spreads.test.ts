@@ -33,6 +33,7 @@ describe('built-in spreads', () => {
         'situation-action-outcome',
         'situationship',
         'three-card',
+        'trend',
         'true-love',
         'wealth',
         'wealth-flow',
