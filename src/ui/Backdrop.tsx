@@ -26,7 +26,7 @@ float starLayer(vec2 uv, float density, float thr){
   vec2 id = floor(g), f = fract(g) - 0.5;
   float h = hash(id);
   float present = step(thr, h);
-  float tw = 0.45 + 0.55 * sin(u_time * 1.5 + h * 62.0);
+  float tw = 0.72 + 0.28 * sin(u_time * 0.6 + h * 62.0);
   return present * smoothstep(0.07, 0.0, length(f)) * tw;
 }
 void main(){

@@ -66,8 +66,8 @@ function ParallaxRig({ children }: { children: ReactNode }) {
     if (!ref.current || reduced || !HAS_FINE_POINTER) return
     easing.dampE(
       ref.current.rotation,
-      [state.pointer.y * 0.07, state.pointer.x * 0.09, 0],
-      0.35,
+      [state.pointer.y * 0.035, state.pointer.x * 0.045, 0],
+      0.6,
       dt,
     )
   })
@@ -103,17 +103,20 @@ export function Scene() {
       <pointLight position={[-8, -2, 7]} intensity={0.5} color="#9b7fd4" />
 
       <Suspense fallback={null}>
+        {/* a calm, near-still starfield — OUTSIDE the parallax rig so it does
+            not dart around when the pointer moves */}
+        <Sparkles
+          count={SPARKLE_COUNT}
+          scale={[16, 11, 5]}
+          position={[0, 1.5, 2.5]}
+          size={1.8}
+          speed={0.08}
+          noise={0.4}
+          opacity={0.45}
+          color="#f4dc9c"
+        />
         <ParallaxRig>
           <Table />
-          <Sparkles
-            count={SPARKLE_COUNT}
-            scale={[16, 11, 5]}
-            position={[0, 1.5, 2.5]}
-            size={2.4}
-            speed={0.28}
-            opacity={0.5}
-            color="#f4dc9c"
-          />
           <SlotOutlines />
           <Deck />
         </ParallaxRig>
