@@ -67,41 +67,77 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* warm gold dust motes — candlelit dark */
-body::before {
-  content: '';
+/* ── animated site backdrop (seamless; rendered by <Backdrop/>) ──────────── */
+.backdrop {
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(244, 220, 156, 0.5), transparent),
-    radial-gradient(1px 1px at 72% 62%, rgba(236, 198, 106, 0.3), transparent),
-    radial-gradient(1.5px 1.5px at 40% 82%, rgba(217, 164, 65, 0.4), transparent),
-    radial-gradient(1px 1px at 86% 16%, rgba(243, 234, 214, 0.32), transparent);
-  background-size:
-    420px 420px,
-    320px 320px,
-    520px 520px,
-    360px 360px;
-  opacity: 0.55;
   z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* drifting candlelit aurora — large soft blobs, no tiling = no seams */
+.aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+  animation: aurora-drift 30s ease-in-out infinite;
+}
+.aurora-a {
+  width: 62vmax;
+  height: 62vmax;
+  left: -16vmax;
+  top: -22vmax;
+  background: radial-gradient(circle, rgba(217, 164, 65, 0.26), transparent 70%);
+}
+.aurora-b {
+  width: 56vmax;
+  height: 56vmax;
+  right: -20vmax;
+  top: 6vmax;
+  background: radial-gradient(circle, rgba(155, 127, 212, 0.2), transparent 70%);
+  animation-duration: 38s;
+  animation-direction: reverse;
+}
+.aurora-c {
+  width: 52vmax;
+  height: 52vmax;
+  left: 16vmax;
+  bottom: -26vmax;
+  background: radial-gradient(circle, rgba(124, 53, 99, 0.28), transparent 70%);
+  animation-duration: 46s;
+}
+/* twinkling star — position / size / colour set inline by the component */
+.star {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: 0 0 4px currentColor;
+  animation: twinkle 6s ease-in-out infinite;
+}
+/* edge vignette — single radial, seamless */
+.backdrop-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130% 120% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.6) 100%);
 }
 
-/* paper grain + edge vignette — illuminated-manuscript atmosphere */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    radial-gradient(130% 130% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.55) 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  background-size:
-    100% 100%,
-    160px 160px;
-  opacity: 0.35;
-  mix-blend-mode: soft-light;
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5%, -4%, 0) scale(1.18);
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: var(--star-o, 0.5);
+  }
+  50% {
+    opacity: calc(var(--star-o, 0.5) * 0.2);
+  }
 }
 
 /* gold hairline rule */

@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './routes/Layout'
+import { Backdrop } from './ui/Backdrop'
 import { Loading } from './ui/Loading'
 import { useLLMConfig } from './store/llmConfig.store'
 import { parseSharedConfigFromHash } from './llm/shareLink'
@@ -22,7 +23,9 @@ export function App() {
   }, [])
 
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+    <>
+      <Backdrop />
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <Routes>
         <Route element={<Layout />}>
           <Route
@@ -68,6 +71,7 @@ export function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </>
   )
 }
