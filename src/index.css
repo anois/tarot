@@ -75,28 +75,28 @@ body {
   overflow: hidden;
   pointer-events: none;
 }
-/* drifting candlelit aurora — large soft blobs, no tiling = no seams */
+/* drifting candlelit aurora — large soft blobs that breathe & wander */
 .aurora {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  will-change: transform;
-  animation: aurora-drift 30s ease-in-out infinite;
+  filter: blur(80px);
+  will-change: transform, opacity;
+  animation: aurora-drift 22s ease-in-out infinite;
 }
 .aurora-a {
   width: 62vmax;
   height: 62vmax;
   left: -16vmax;
   top: -22vmax;
-  background: radial-gradient(circle, rgba(217, 164, 65, 0.26), transparent 70%);
+  background: radial-gradient(circle, rgba(217, 164, 65, 0.28), transparent 70%);
 }
 .aurora-b {
   width: 56vmax;
   height: 56vmax;
   right: -20vmax;
   top: 6vmax;
-  background: radial-gradient(circle, rgba(155, 127, 212, 0.2), transparent 70%);
-  animation-duration: 38s;
+  background: radial-gradient(circle, rgba(155, 127, 212, 0.22), transparent 70%);
+  animation-duration: 28s;
   animation-direction: reverse;
 }
 .aurora-c {
@@ -104,15 +104,32 @@ body {
   height: 52vmax;
   left: 16vmax;
   bottom: -26vmax;
-  background: radial-gradient(circle, rgba(124, 53, 99, 0.28), transparent 70%);
-  animation-duration: 46s;
+  background: radial-gradient(circle, rgba(124, 53, 99, 0.3), transparent 70%);
+  animation-duration: 34s;
 }
-/* twinkling star — position / size / colour set inline by the component */
+/* the whole starfield drifts gently (parallax) while individual stars twinkle */
+.starfield {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  animation: star-drift 40s ease-in-out infinite;
+}
 .star {
   position: absolute;
   border-radius: 50%;
   box-shadow: 0 0 4px currentColor;
   animation: twinkle 6s ease-in-out infinite;
+}
+/* fine grain — ONE non-repeating instance; dithers the gradients so there is
+   no banding and no tile seam */
+.backdrop-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
 }
 /* edge vignette — single radial, seamless */
 .backdrop-vignette {
@@ -124,10 +141,21 @@ body {
 @keyframes aurora-drift {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(-2%, -1%, 0) scale(1);
+    opacity: 0.55;
   }
   50% {
-    transform: translate3d(5%, -4%, 0) scale(1.18);
+    transform: translate3d(7%, -6%, 0) scale(1.25);
+    opacity: 0.9;
+  }
+}
+@keyframes star-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2.5%, 1.5%, 0);
   }
 }
 @keyframes twinkle {

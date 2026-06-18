@@ -42,25 +42,28 @@ export function Backdrop() {
       <div className="aurora aurora-a" />
       <div className="aurora aurora-b" />
       <div className="aurora aurora-c" />
-      {stars.map((st, i) => (
-        <span
-          key={i}
-          className="star"
-          style={
-            {
-              left: `${st.x}%`,
-              top: `${st.y}%`,
-              width: st.size,
-              height: st.size,
-              color: st.color,
-              background: st.color,
-              animationDelay: `${st.delay}s`,
-              animationDuration: `${st.dur}s`,
-              '--star-o': st.opacity,
-            } as CSSProperties
-          }
-        />
-      ))}
+      <div className="starfield">
+        {stars.map((st, i) => (
+          <span
+            key={i}
+            className="star"
+            style={
+              {
+                left: `${st.x}%`,
+                top: `${st.y}%`,
+                width: st.size,
+                height: st.size,
+                color: st.color,
+                background: st.color,
+                animationDelay: `${st.delay}s`,
+                animationDuration: `${st.dur}s`,
+                '--star-o': st.opacity,
+              } as CSSProperties
+            }
+          />
+        ))}
+      </div>
+      <div className="backdrop-grain" />
       <div className="backdrop-vignette" />
     </div>
   )
